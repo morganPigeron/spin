@@ -11,91 +11,12 @@ import rl "vendor:raylib"
 import mu "vendor:microui"
 
 GameCtx :: struct {
-	player: ^Player
+	player: Player
 }
 
 ShapeType :: enum {
 	PLAYER,
 	GROUND,
-}
-
-Player :: struct {
-	body_id:  	  b2.BodyId,
-	shape_id: 	  b2.ShapeId,
-	extends : 	  b2.Vec2,
-	shape_type:   ShapeType,
-	jump_speed:   f32,
-	move_speed:   f32,
-	move_max_velocity :f32,
-	is_on_ground: bool,
-}
-
-Ground :: struct {
-	extends :   b2.Vec2,
-	body_id:    b2.BodyId,
-	shape_id:   b2.ShapeId,
-	shape_type: ShapeType,
-}
-
-move_right :: proc(player: ^Player) {
-	velocity := b2.Body_GetLinearVelocity(player.body_id).x
-	if velocity < 0 || abs(velocity) < player.move_max_velocity {
-		b2.Body_ApplyForceToCenter(player.body_id, {player.move_speed, 0}, true)
-	}
-}
-
-move_left :: proc(player: ^Player) {
-	velocity := b2.Body_GetLinearVelocity(player.body_id).x
-	if velocity > 0 || abs(velocity) < player.move_max_velocity {
-		b2.Body_ApplyForceToCenter(player.body_id, {- player.move_speed, 0}, true)
-	}
-}
-
-jump :: proc(player: ^Player) {
-	if player.is_on_ground {
-		b2.Body_ApplyLinearImpulseToCenter(player.body_id, {0, - UNIT * player.jump_speed}, true)
-	}
-}
-
-player_update :: proc(player: ^Player, contact_events: b2.ContactEvents) {
-	for begin in contact_events.beginEvents[:contact_events.beginCount] {
-		a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
-		b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)
-		
-		if a^ == .GROUND && b^ == .PLAYER {
-			player.is_on_ground = true
-		} else if a^ == .PLAYER && b^ == .GROUND {
-			player.is_on_ground = true
-		}
-	}
-
-	for end in contact_events.endEvents[:contact_events.endCount] {
-		a := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdA)
-		b := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdB)
-		
-		if a^ == .GROUND && b^ == .PLAYER {
-			player.is_on_ground = false
-		} else if a^ == .PLAYER && b^ == .GROUND {
-			player.is_on_ground = false
-		}
-	}
-}
-
-render_player :: proc(player: Player) {
-	pos := b2.Body_GetPosition(player.body_id)
-	rot := b2.Body_GetRotation(player.body_id)
-	rl.DrawRectanglePro(
-		{
-			pos.x - player.extends.x,
-			pos.y - player.extends.y,
-			player.extends.x * 2,
-			player.extends.y * 2
-		},
-		{0, 0},
-		b2.Rot_GetAngle(rot) * rl.RAD2DEG,
-		rl.BLUE
-	)
-	rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
 }
 
 UNIT :: 64 // 64 px => 1m
@@ -181,47 +102,22 @@ main :: proc() {
 	world_id := b2.CreateWorld(world)
 	defer b2.DestroyWorld(world_id)
 	
+	// game ctx
+	game_ctx: GameCtx
+	game_ctx.player = create_player(world_id)
+	//TODO the pointer to user data need to be always valid
+	b2.Shape_SetUserData(game_ctx.player.shape_id, &game_ctx.player.shape_type)
+	
 	// ground
-	ground : Ground
-	ground.shape_type = .GROUND
-	ground_body := b2.DefaultBodyDef()
-	ground_body.position = {f32(rl.GetScreenWidth())/2 , f32(rl.GetScreenHeight()) + UNIT/2}
-	ground_body_id := b2.CreateBody(world_id, ground_body)
-	ground.extends = {f32(rl.GetScreenWidth()/2), UNIT/2}
-	ground_box := b2.MakeBox(ground.extends.x, ground.extends.y)
-	ground_shape := b2.DefaultShapeDef()
-	ground_shape.userData = &ground.shape_type
-	ground_shape_id := b2.CreatePolygonShape(ground_body_id, ground_shape, ground_box)
-	ground.body_id = ground_body_id
-	ground.shape_id = ground_shape_id
-
-	// player
-	player : Player
-	player.shape_type = .PLAYER
-	body := b2.DefaultBodyDef()
-	body.type = .dynamicBody
-	body.position = {f32(rl.GetScreenWidth())/2, -4}
-	body.fixedRotation = true
-	body_id := b2.CreateBody(world_id, body)
-	player.extends = {UNIT/4, UNIT/2}
-	dynamic_box := b2.MakeBox(player.extends.x , player.extends.y)
-	shape_def := b2.DefaultShapeDef()
-	shape_def.userData = &player.shape_type
-	shape_def.density = 1
-	shape_def.friction = 0.07
-	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
-	player.body_id = body_id
-	player.shape_id = shape_id
-	player.jump_speed = 130 * UNIT
-	player.move_speed = 31572 * UNIT
-	player.move_max_velocity = 3 * UNIT
+	ground := create_ground(world_id)
+	b2.Shape_SetUserData(ground.shape_id, &ground.shape_type)
+	
+	// wheel
+	wheel := create_wheel()
+	defer delete_wheel(wheel)
 
 	camera := rl.Camera2D{}// camera
 	camera.zoom = 1
-
-	// game ctx
-	game_ctx: GameCtx
-	game_ctx.player = &player
 
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
@@ -281,16 +177,16 @@ main :: proc() {
 			contact_events = b2.World_GetContactEvents(world_id)
 		}
 
-		player_update(&player, contact_events)
+		player_update(&game_ctx.player, contact_events)
 
 		{ 	//update
 			if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
-				move_right(&player)
+				move_right(&game_ctx.player)
 			} else if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
-				move_left(&player)
+				move_left(&game_ctx.player)
 			}
 			if rl.IsKeyDown(.SPACE) {
-				jump(&player)
+				jump(&game_ctx.player)
 			}
 		}
 
@@ -318,7 +214,8 @@ main :: proc() {
 				rl.BeginMode2D(camera)
 				defer rl.EndMode2D()
 
-				render_player(player)
+				render_player(game_ctx.player)
+				render_wheel(&wheel)
 			}
 
 			rl.DrawFPS(10, 10)
