@@ -11,7 +11,7 @@ import rl "vendor:raylib"
 import mu "vendor:microui"
 
 GameCtx :: struct {
-	player: Player
+	player: ^Player
 }
 
 ShapeType :: enum {
@@ -96,7 +96,6 @@ render_player :: proc(player: Player) {
 		rl.BLUE
 	)
 	rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
-	rl.DrawText(fmt.ctprintf("%.2f", b2.Rot_GetAngle(rot) * rl.RAD2DEG), i32(pos.x), i32(pos.y), 28, rl.RED)
 }
 
 UNIT :: 64 // 64 px => 1m
@@ -204,25 +203,25 @@ main :: proc() {
 	body.position = {f32(rl.GetScreenWidth())/2, -4}
 	body.fixedRotation = true
 	body_id := b2.CreateBody(world_id, body)
-	player.extends = {UNIT/2, UNIT/2}
+	player.extends = {UNIT/4, UNIT/2}
 	dynamic_box := b2.MakeBox(player.extends.x , player.extends.y)
 	shape_def := b2.DefaultShapeDef()
 	shape_def.userData = &player.shape_type
 	shape_def.density = 1
-	shape_def.friction = 0.01
+	shape_def.friction = 0.07
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
 	player.body_id = body_id
 	player.shape_id = shape_id
-	player.jump_speed = 500 * UNIT
-	player.move_speed = 100000 * UNIT
-	player.move_max_velocity = 2 * UNIT
+	player.jump_speed = 130 * UNIT
+	player.move_speed = 31572 * UNIT
+	player.move_max_velocity = 3 * UNIT
 
 	camera := rl.Camera2D{}// camera
 	camera.zoom = 1
 
 	// game ctx
 	game_ctx: GameCtx
-	game_ctx.player = player
+	game_ctx.player = &player
 
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
@@ -323,8 +322,6 @@ main :: proc() {
 			}
 
 			rl.DrawFPS(10, 10)
-			//rl.DrawText(fmt.ctprintf("pos: %v", player.pos), 10, 30, 22, rl.BLACK)
-			rl.DrawText(fmt.ctprintf("on ground: %v", player.is_on_ground), 10, 50, 22, rl.BLACK)
 			render(ctx)
 		}
 	}

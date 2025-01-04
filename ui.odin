@@ -15,11 +15,39 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 	@(static) opts := mu.Options{.NO_CLOSE}
 
 	if mu.window(ctx, "Game state", {40, 40, 300, 200}, opts) {
-		if .ACTIVE in mu.header(ctx, fmt.tprintf("player: %p", game_ctx.player)) {
+		if .ACTIVE in mu.header(ctx, "player") {
+			player := game_ctx.player
 			mu.layout_row(ctx, {150, -1}, 0)
-			mu.label(ctx, "entity position: ")
-			pos := b2.Body_GetPosition(game_ctx.player.body_id)
+			mu.label(ctx, "is on ground: ")
+			mu.label(ctx, fmt.tprintf("%v", player.is_on_ground))
+			mu.label(ctx, "position: ")
+			pos := b2.Body_GetPosition(player.body_id)
 			mu.label(ctx, fmt.tprintf("x: %.2f y: %.2f", pos.x, pos.y))
+
+			{ 	// max velocity slider
+				mu.label(ctx, "max velocity (m/s): ")
+				value := player.move_max_velocity / UNIT
+				mu.slider(ctx, &value, 0, 10)
+				player.move_max_velocity = value * UNIT
+			}
+			{ 	// move force slider
+				mu.label(ctx, "move force (N): ")
+				value := player.move_speed / UNIT
+				mu.slider(ctx, &value, 10000, 500000)
+				player.move_speed = value * UNIT
+			}
+			{ 	// jump speed slider
+				mu.label(ctx, "jump impulse (N): ")
+				value := player.jump_speed / UNIT
+				mu.slider(ctx, &value, 100, 1000)
+				player.jump_speed = value * UNIT
+			}
+			{ 	// friction slider
+				value := b2.Shape_GetFriction(player.shape_id)
+				mu.label(ctx, "friction coef: ")
+				mu.slider(ctx, &value, 0, 1)
+				b2.Shape_SetFriction(player.shape_id, value)
+			}
 		}
 	}
 }
