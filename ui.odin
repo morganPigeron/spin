@@ -16,7 +16,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 
 	if mu.window(ctx, "Game state", {40, 40, 300, 200}, opts) {
 		if .ACTIVE in mu.header(ctx, "player") {
-			player := game_ctx.player
+			player := &game_ctx.player
 			mu.layout_row(ctx, {150, -1}, 0)
 			mu.label(ctx, "is on ground: ")
 			mu.label(ctx, fmt.tprintf("%v", player.is_on_ground))
@@ -47,6 +47,25 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.label(ctx, "friction coef: ")
 				mu.slider(ctx, &value, 0, 1)
 				b2.Shape_SetFriction(player.shape_id, value)
+			}
+		}
+		if .ACTIVE in mu.header(ctx, "wheel") {
+			wheel := &game_ctx.wheel
+			if .SUBMIT in mu.button(ctx, "Spin the wheel !") {
+				start_wheel(wheel)
+			}
+			mu.layout_row(ctx, {150, -1}, 0)
+			mu.label(ctx, "speed: ")
+			mu.label(ctx, fmt.tprintf("%v", wheel.speed))
+			mu.label(ctx, "is turning: ")
+			mu.label(ctx, fmt.tprintf("%v", wheel.is_turning))
+			{ 	// friction slider
+				mu.label(ctx, "friction coef: ")
+				mu.slider(ctx, &wheel.friction, 0, 1)
+			}
+			{ 	// impulse slider
+				mu.label(ctx, "impulse speed: ")
+				mu.slider(ctx, &wheel.impulse_speed, 20, 400)
 			}
 		}
 	}

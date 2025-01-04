@@ -11,7 +11,8 @@ import rl "vendor:raylib"
 import mu "vendor:microui"
 
 GameCtx :: struct {
-	player: Player
+	player: Player,
+	wheel: Wheel,
 }
 
 ShapeType :: enum {
@@ -107,14 +108,12 @@ main :: proc() {
 	game_ctx.player = create_player(world_id)
 	//TODO the pointer to user data need to be always valid
 	b2.Shape_SetUserData(game_ctx.player.shape_id, &game_ctx.player.shape_type)
-	
+	game_ctx.wheel = create_wheel()
+	defer delete_wheel(game_ctx.wheel)
+
 	// ground
 	ground := create_ground(world_id)
 	b2.Shape_SetUserData(ground.shape_id, &ground.shape_type)
-	
-	// wheel
-	wheel := create_wheel()
-	defer delete_wheel(wheel)
 
 	camera := rl.Camera2D{}// camera
 	camera.zoom = 1
@@ -190,6 +189,8 @@ main :: proc() {
 			}
 		}
 
+		update_wheel(&game_ctx.wheel)
+
 		{ 	// update mico ui 
 			if rl.IsWindowResized() {
 				state.screen_width = rl.GetScreenWidth()
@@ -215,7 +216,7 @@ main :: proc() {
 				defer rl.EndMode2D()
 
 				render_player(game_ctx.player)
-				render_wheel(&wheel)
+				render_wheel(&game_ctx.wheel)
 			}
 
 			rl.DrawFPS(10, 10)
