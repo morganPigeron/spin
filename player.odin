@@ -20,6 +20,23 @@ Player :: struct {
 	is_on_ground:      bool,
 }
 
+player_shoot :: proc(player: ^Player, ctx: ^GameCtx) {
+	direction: rl.Vector2 = {0, 0}
+	if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
+		direction.x = 1
+	} else if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
+		direction.x = -1
+	}
+
+	if rl.IsKeyDown(.UP) || rl.IsKeyDown(.W) {
+		direction.y = -1
+	} else if rl.IsKeyDown(.DOWN) || rl.IsKeyDown(.S) {
+		direction.y = 1
+	}
+
+	spawn_player_bullet(ctx, b2.Body_GetPosition(player.body_id), direction)
+}
+
 player_move_right :: proc(player: ^Player) {
 	velocity := b2.Body_GetLinearVelocity(player.body_id).x
 	if velocity < 0 || abs(velocity) < player.move_max_velocity {

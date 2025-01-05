@@ -28,6 +28,7 @@ Wheel :: struct {
 	is_sound_playing:   bool,
 	good_sound:         rl.Sound,
 	bad_sound:          rl.Sound,
+	volume_sound:       f32,
 }
 
 create_wheel :: proc() -> (wheel: Wheel) {
@@ -37,12 +38,12 @@ create_wheel :: proc() -> (wheel: Wheel) {
 	wheel.impulse_speed = 260
 	wheel.friction = 0.60
 	for i in 0 ..< 16 {
-		append(&wheel.elements, WheelElement{color = rl.Color{u8(i * 10), 125, u8(i * 10), 255}})
+		append(&wheel.elements, WheelElement{color = rl.Color{u8(i * 40), 125, u8(i * 20), 255}})
 	}
 
 	wheel.good_sound = rl.LoadSound(GOOD_SPIN)
 	wheel.bad_sound = rl.LoadSound(BAD_SPIN)
-
+	wheel.volume_sound = 1
 	return
 }
 
@@ -64,6 +65,7 @@ update_wheel :: proc(wheel: ^Wheel) {
 
 	if wheel.need_to_play_sound {
 		wheel.need_to_play_sound = false
+		rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
 		rl.PlaySound(wheel.good_sound)
 	}
 
@@ -98,11 +100,11 @@ render_wheel :: proc(wheel: Wheel) {
 		x_end := wheel.radius * math.sin(f32(rl.DEG2RAD) * angle_end)
 		y_end := wheel.radius * math.cos(f32(rl.DEG2RAD) * angle_end)
 
-		rl.DrawTriangleLines(
+		rl.DrawTriangle(
 			wheel.position,
 			{x_start, y_start} + wheel.position,
 			{x_end, y_end} + wheel.position,
-			rl.RED,
+			element.color,
 		)
 	}
 }

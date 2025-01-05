@@ -14,6 +14,7 @@ ShapeType :: enum {
 	PLAYER,
 	GROUND,
 	ENEMY,
+	BULLET_FROM_PLAYER,
 }
 
 UNIT :: 64 // 64 px => 1m
@@ -204,6 +205,9 @@ main :: proc() {
 			}
 			if rl.IsKeyDown(.SPACE) {
 				player_jump(&game_ctx.player)
+			}
+			if rl.IsKeyDown(.LEFT_CONTROL) {
+				//player_shoot(&game_ctx.player, &game_ctx)
 			}
 		}
 

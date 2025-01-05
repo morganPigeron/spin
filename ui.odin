@@ -15,6 +15,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 	@(static) opts := mu.Options{.NO_CLOSE}
 
 	if mu.window(ctx, "Game state", {40, 40, 300, 200}, opts) {
+
 		if .ACTIVE in mu.header(ctx, "player") {
 			player := &game_ctx.player
 			mu.layout_row(ctx, {150, -1}, 0)
@@ -49,6 +50,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				b2.Shape_SetFriction(player.shape_id, value)
 			}
 		}
+
 		if .ACTIVE in mu.header(ctx, "enemy") && len(game_ctx.enemies) > 0 {
 			enemy := &game_ctx.enemies[0]
 			mu.layout_row(ctx, {150, -1}, 0)
@@ -89,6 +91,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				b2.Shape_SetFriction(e.shape_id, value)
 			}
 		}
+
 		if .ACTIVE in mu.header(ctx, "wheel") {
 			wheel := &game_ctx.wheel
 			if .SUBMIT in mu.button(ctx, "Spin the wheel !") {
@@ -103,6 +106,12 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			mu.label(ctx, fmt.tprintf("%v", wheel.need_to_play_sound))
 			mu.label(ctx, "is sound playing: ")
 			mu.label(ctx, fmt.tprintf("%v", wheel.is_sound_playing))
+			{ 	// sound volume slider
+				mu.label(ctx, "volume: ")
+				mu.slider(ctx, &wheel.volume_sound, 0, 1)
+				rl.SetSoundVolume(wheel.bad_sound, wheel.volume_sound)
+				rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
+			}
 			{ 	// friction slider
 				mu.label(ctx, "friction coef: ")
 				mu.slider(ctx, &wheel.friction, 0, 1)
@@ -112,6 +121,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.slider(ctx, &wheel.impulse_speed, 20, 400)
 			}
 		}
+
 		if .ACTIVE in mu.header(ctx, "camera") {
 			camera := &game_ctx.camera
 			mu.layout_row(ctx, {150, -1}, 0)
