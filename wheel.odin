@@ -16,14 +16,18 @@ WheelElement :: struct {
 }
 
 Wheel :: struct {
-	position:      rl.Vector2,
-	radius:        f32,
-	elements:      [dynamic]WheelElement,
-	angle:         f32,
-	speed:         f32,
-	impulse_speed: f32,
-	friction:      f32,
-	is_turning:    bool,
+	position:           rl.Vector2,
+	radius:             f32,
+	elements:           [dynamic]WheelElement,
+	angle:              f32,
+	speed:              f32,
+	impulse_speed:      f32,
+	friction:           f32,
+	is_turning:         bool,
+	need_to_play_sound: bool,
+	is_sound_playing:   bool,
+	good_sound:         rl.Sound,
+	bad_sound:          rl.Sound,
 }
 
 create_wheel :: proc() -> (wheel: Wheel) {
@@ -36,6 +40,9 @@ create_wheel :: proc() -> (wheel: Wheel) {
 		append(&wheel.elements, WheelElement{color = rl.Color{u8(i * 10), 125, u8(i * 10), 255}})
 	}
 
+	wheel.good_sound = rl.LoadSound(GOOD_SPIN)
+	wheel.bad_sound = rl.LoadSound(BAD_SPIN)
+
 	return
 }
 
@@ -45,13 +52,19 @@ delete_wheel :: proc(wheel: Wheel) {
 
 update_wheel :: proc(wheel: ^Wheel) {
 
-	if wheel.speed <= 0.01 {
+	if wheel.speed <= 0.01 && wheel.is_turning {
 		wheel.speed = 0
 		wheel.is_turning = false
+		wheel.need_to_play_sound = true
 	}
 
-	if rl.IsKeyPressed(.T) && wheel.speed == 0 {
+	if rl.IsKeyPressed(.T) {
 		start_wheel(wheel)
+	}
+
+	if wheel.need_to_play_sound {
+		wheel.need_to_play_sound = false
+		rl.PlaySound(wheel.good_sound)
 	}
 
 	if wheel.is_turning {
@@ -61,13 +74,15 @@ update_wheel :: proc(wheel: ^Wheel) {
 			wheel.angle = 0
 		}
 	}
+
+	wheel.is_sound_playing = rl.IsSoundPlaying(wheel.good_sound)
 }
 
 start_wheel :: proc(wheel: ^Wheel) {
-	//if rl.IsKeyPressed(.T) && wheel.speed == 0 {
-	wheel.speed = wheel.impulse_speed
-	wheel.is_turning = true
-	//}
+	if wheel.is_turning == false {
+		wheel.speed = wheel.impulse_speed
+		wheel.is_turning = true
+	}
 }
 render_wheel :: proc(wheel: ^Wheel) {
 	rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)

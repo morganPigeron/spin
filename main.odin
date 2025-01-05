@@ -50,6 +50,8 @@ main :: proc() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
+	rl.InitAudioDevice()      
+
 	// connect clipboard with microui
 	ctx := &state.mu_ctx
 	mu.init(ctx, set_clipboard = proc(user_data: rawptr, text: string) -> (ok: bool) {

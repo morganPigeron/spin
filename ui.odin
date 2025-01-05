@@ -59,6 +59,10 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			mu.label(ctx, fmt.tprintf("%v", wheel.speed))
 			mu.label(ctx, "is turning: ")
 			mu.label(ctx, fmt.tprintf("%v", wheel.is_turning))
+			mu.label(ctx, "need to play sound: ")
+			mu.label(ctx, fmt.tprintf("%v", wheel.need_to_play_sound))
+			mu.label(ctx, "is sound playing: ")
+			mu.label(ctx, fmt.tprintf("%v", wheel.is_sound_playing))
 			{ 	// friction slider
 				mu.label(ctx, "friction coef: ")
 				mu.slider(ctx, &wheel.friction, 0, 1)
