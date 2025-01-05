@@ -132,6 +132,17 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.slider(ctx, &camera.zoom, 0.1, 10)
 			}
 		}
+
+		if .ACTIVE in mu.header(ctx, "inputs") {
+			inputs := &game_ctx.key_inputs
+			mu.layout_row(ctx, {150, -1}, 0)
+			mu.label(ctx, "functions ")
+			mu.label(ctx, fmt.tprintf("keyboard key (NOT modifiable for now)"))
+			for key, i in inputs {
+				mu.label(ctx, fmt.tprintf("%v", i))
+				mu.label(ctx, fmt.tprintf("%v", key))
+			}
+		}
 	}
 }
 

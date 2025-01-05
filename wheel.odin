@@ -59,10 +59,6 @@ update_wheel :: proc(wheel: ^Wheel) {
 		wheel.need_to_play_sound = true
 	}
 
-	if rl.IsKeyPressed(.T) {
-		start_wheel(wheel)
-	}
-
 	if wheel.need_to_play_sound {
 		wheel.need_to_play_sound = false
 		rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)

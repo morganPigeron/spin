@@ -22,15 +22,15 @@ Player :: struct {
 
 player_shoot :: proc(player: ^Player, ctx: ^GameCtx) {
 	direction: rl.Vector2 = {0, 0}
-	if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
+	if rl.IsKeyDown(ctx.key_inputs[.RIGHT]) {
 		direction.x = 1
-	} else if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
+	} else if rl.IsKeyDown(ctx.key_inputs[.LEFT]) {
 		direction.x = -1
 	}
 
-	if rl.IsKeyDown(.UP) || rl.IsKeyDown(.W) {
+	if rl.IsKeyDown(ctx.key_inputs[.UP]) {
 		direction.y = -1
-	} else if rl.IsKeyDown(.DOWN) || rl.IsKeyDown(.S) {
+	} else if rl.IsKeyDown(ctx.key_inputs[.DOWN]) {
 		direction.y = 1
 	}
 

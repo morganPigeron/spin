@@ -198,16 +198,13 @@ main :: proc() {
 		}
 
 		{ 	//update
-			if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
+			if rl.IsKeyDown(game_ctx.key_inputs[.RIGHT]) {
 				player_move_right(&game_ctx.player)
-			} else if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
+			} else if rl.IsKeyDown(game_ctx.key_inputs[.LEFT]) {
 				player_move_left(&game_ctx.player)
 			}
-			if rl.IsKeyDown(.SPACE) {
+			if rl.IsKeyDown(game_ctx.key_inputs[.JUMP]) {
 				player_jump(&game_ctx.player)
-			}
-			if rl.IsKeyDown(.LEFT_CONTROL) {
-				//player_shoot(&game_ctx.player, &game_ctx)
 			}
 		}
 
