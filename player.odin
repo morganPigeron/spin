@@ -40,7 +40,7 @@ jump :: proc(player: ^Player) {
 	}
 }
 
-player_update :: proc(player: ^Player, contact_events: b2.ContactEvents) {
+update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 	for begin in contact_events.beginEvents[:contact_events.beginCount] {
 		a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
 		b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)

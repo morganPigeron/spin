@@ -10,14 +10,10 @@ import b2 "vendor:box2d"
 import rl "vendor:raylib"
 import mu "vendor:microui"
 
-GameCtx :: struct {
-	player: Player,
-	wheel: Wheel,
-}
-
 ShapeType :: enum {
 	PLAYER,
 	GROUND,
+	ENEMY,
 }
 
 UNIT :: 64 // 64 px => 1m
@@ -106,12 +102,20 @@ main :: proc() {
 	defer b2.DestroyWorld(world_id)
 	
 	// game ctx
-	game_ctx: GameCtx
+	game_ctx := new_game_ctx()
+	defer delete_game_ctx(game_ctx)
 	game_ctx.player = create_player(world_id)
 	//TODO the pointer to user data need to be always valid
 	b2.Shape_SetUserData(game_ctx.player.shape_id, &game_ctx.player.shape_type)
 	game_ctx.wheel = create_wheel()
 	defer delete_wheel(game_ctx.wheel)
+	
+	for i in 0 ..< 5 {
+		append(&game_ctx.enemies, create_enemy(world_id, {780, f32(UNIT * i)}))
+		e := &game_ctx.enemies[len(game_ctx.enemies) - 1]
+		b2.Shape_SetUserData(e.shape_id, &e.shape_type)
+	}	
+
 
 	// ground
 	ground := create_ground(world_id)
@@ -178,7 +182,10 @@ main :: proc() {
 			contact_events = b2.World_GetContactEvents(world_id)
 		}
 
-		player_update(&game_ctx.player, contact_events)
+		update_player(&game_ctx.player, contact_events)
+		for &enemy in game_ctx.enemies {
+			update_enemy(&enemy, contact_events)
+		}
 
 		{ 	//update
 			if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
@@ -217,8 +224,11 @@ main :: proc() {
 				rl.BeginMode2D(camera)
 				defer rl.EndMode2D()
 
-				render_player(game_ctx.player)
+				for &enemy in game_ctx.enemies {
+					render_enemy(enemy)
+				}
 				render_wheel(&game_ctx.wheel)
+				render_player(game_ctx.player)
 			}
 
 			rl.DrawFPS(10, 10)
