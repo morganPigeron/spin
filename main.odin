@@ -17,7 +17,8 @@ ShapeType :: enum {
 }
 
 UNIT :: 64 // 64 px => 1m
-
+INITIAL_SCREEN_WIDTH :: 800
+INITIAL_SCREEN_HEIGHT :: 600
 main :: proc() {
 	context.logger = log.create_console_logger()
 
@@ -42,7 +43,7 @@ main :: proc() {
 
 	// window init
 	rl.SetConfigFlags({.WINDOW_RESIZABLE})
-	rl.InitWindow(800, 600, "Spin")
+	rl.InitWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, "Spin")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
@@ -116,16 +117,23 @@ main :: proc() {
 		b2.Shape_SetUserData(e.shape_id, &e.shape_type)
 	}	
 
-
 	// ground
-	ground := create_ground(world_id)
-	b2.Shape_SetUserData(ground.shape_id, &ground.shape_type)
-
-	camera := rl.Camera2D{}// camera
-	camera.zoom = 1
+	game_ctx.ground = create_ground(world_id)
+	b2.Shape_SetUserData(game_ctx.ground.shape_id, &game_ctx.ground.shape_type)
+	
+	{
+		camera := rl.Camera2D{}// camera
+		camera.zoom = 1
+		game_ctx.camera = camera
+	}
 
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
+
+		if rl.IsWindowResized() {
+			state.screen_width = rl.GetScreenWidth()
+			state.screen_height = rl.GetScreenHeight()
+		}
 		
 		{ // micro ui
 			// connect mouse input
@@ -202,8 +210,6 @@ main :: proc() {
 
 		{ 	// update mico ui 
 			if rl.IsWindowResized() {
-				state.screen_width = rl.GetScreenWidth()
-				state.screen_height = rl.GetScreenHeight()
 				rl.UnloadRenderTexture(state.screen_texture)
 				state.screen_texture = rl.LoadRenderTexture(
 					state.screen_width,
@@ -221,13 +227,14 @@ main :: proc() {
 			rl.ClearBackground(rl.RAYWHITE)
 
 			{
-				rl.BeginMode2D(camera)
+				rl.BeginMode2D(game_ctx.camera)
 				defer rl.EndMode2D()
 
+				render_ground(game_ctx.ground)
 				for &enemy in game_ctx.enemies {
 					render_enemy(enemy)
 				}
-				render_wheel(&game_ctx.wheel)
+				render_wheel(game_ctx.wheel)
 				render_player(game_ctx.player)
 			}
 

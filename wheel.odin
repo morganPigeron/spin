@@ -84,7 +84,7 @@ start_wheel :: proc(wheel: ^Wheel) {
 		wheel.is_turning = true
 	}
 }
-render_wheel :: proc(wheel: ^Wheel) {
+render_wheel :: proc(wheel: Wheel) {
 	rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)
 
 	angle: f32 = 360 / f32(len(wheel.elements))

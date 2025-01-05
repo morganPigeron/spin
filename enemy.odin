@@ -81,3 +81,7 @@ create_enemy :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (enemy: Enemy) {
 	enemy.move_max_velocity = 3 * UNIT
 	return
 }
+
+cleanup_enemy :: proc(enemy: Enemy) {
+	b2.DestroyBody(enemy.body_id)
+}

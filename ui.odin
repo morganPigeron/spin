@@ -72,6 +72,16 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.slider(ctx, &wheel.impulse_speed, 20, 400)
 			}
 		}
+		if .ACTIVE in mu.header(ctx, "camera") {
+			camera := &game_ctx.camera
+			mu.layout_row(ctx, {150, -1}, 0)
+			mu.label(ctx, "target: ")
+			mu.label(ctx, fmt.tprintf("x:%.2f y:%.2f", camera.target.x, camera.target.y))
+			{ 	// friction slider
+				mu.label(ctx, "zoom: ")
+				mu.slider(ctx, &camera.zoom, 0.1, 10)
+			}
+		}
 	}
 }
 
