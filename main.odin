@@ -193,16 +193,17 @@ main :: proc() {
 		update_player(&game_ctx.player, contact_events)
 		for &enemy in game_ctx.enemies {
 			update_enemy(&enemy, contact_events)
+			enemy.behavior(&enemy, game_ctx)
 		}
 
 		{ 	//update
 			if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
-				move_right(&game_ctx.player)
+				player_move_right(&game_ctx.player)
 			} else if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
-				move_left(&game_ctx.player)
+				player_move_left(&game_ctx.player)
 			}
 			if rl.IsKeyDown(.SPACE) {
-				jump(&game_ctx.player)
+				player_jump(&game_ctx.player)
 			}
 		}
 

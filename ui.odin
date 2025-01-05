@@ -49,6 +49,46 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				b2.Shape_SetFriction(player.shape_id, value)
 			}
 		}
+		if .ACTIVE in mu.header(ctx, "enemy") && len(game_ctx.enemies) > 0 {
+			enemy := &game_ctx.enemies[0]
+			mu.layout_row(ctx, {150, -1}, 0)
+			mu.label(ctx, "is on ground: ")
+			mu.label(ctx, fmt.tprintf("%v", enemy.is_on_ground))
+			mu.label(ctx, "position: ")
+			pos := b2.Body_GetPosition(enemy.body_id)
+			mu.label(ctx, fmt.tprintf("x: %.2f y: %.2f", pos.x, pos.y))
+			{ 	// max velocity slider
+				mu.label(ctx, "max velocity (m/s): ")
+				value := enemy.move_max_velocity / UNIT
+				mu.slider(ctx, &value, 0, 10)
+				enemy.move_max_velocity = value * UNIT
+			}
+			{ 	// move force slider
+				mu.label(ctx, "move force (N): ")
+				value := enemy.move_speed / UNIT
+				mu.slider(ctx, &value, 10000, 500000)
+				enemy.move_speed = value * UNIT
+			}
+			{ 	// jump speed slider
+				mu.label(ctx, "jump impulse (N): ")
+				value := enemy.jump_speed / UNIT
+				mu.slider(ctx, &value, 100, 1000)
+				enemy.jump_speed = value * UNIT
+			}
+			{ 	// friction slider
+				value := b2.Shape_GetFriction(enemy.shape_id)
+				mu.label(ctx, "friction coef: ")
+				mu.slider(ctx, &value, 0, 1)
+				b2.Shape_SetFriction(enemy.shape_id, value)
+			}
+			for &e in game_ctx.enemies {
+				e.move_max_velocity = enemy.move_max_velocity
+				e.move_speed = enemy.move_speed
+				e.jump_speed = enemy.jump_speed
+				value := b2.Shape_GetFriction(enemy.shape_id)
+				b2.Shape_SetFriction(e.shape_id, value)
+			}
+		}
 		if .ACTIVE in mu.header(ctx, "wheel") {
 			wheel := &game_ctx.wheel
 			if .SUBMIT in mu.button(ctx, "Spin the wheel !") {

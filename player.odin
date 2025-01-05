@@ -20,21 +20,21 @@ Player :: struct {
 	is_on_ground:      bool,
 }
 
-move_right :: proc(player: ^Player) {
+player_move_right :: proc(player: ^Player) {
 	velocity := b2.Body_GetLinearVelocity(player.body_id).x
 	if velocity < 0 || abs(velocity) < player.move_max_velocity {
 		b2.Body_ApplyForceToCenter(player.body_id, {player.move_speed, 0}, true)
 	}
 }
 
-move_left :: proc(player: ^Player) {
+player_move_left :: proc(player: ^Player) {
 	velocity := b2.Body_GetLinearVelocity(player.body_id).x
 	if velocity > 0 || abs(velocity) < player.move_max_velocity {
 		b2.Body_ApplyForceToCenter(player.body_id, {-player.move_speed, 0}, true)
 	}
 }
 
-jump :: proc(player: ^Player) {
+player_jump :: proc(player: ^Player) {
 	if player.is_on_ground {
 		b2.Body_ApplyLinearImpulseToCenter(player.body_id, {0, -UNIT * player.jump_speed}, true)
 	}

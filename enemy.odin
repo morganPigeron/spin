@@ -18,6 +18,42 @@ Enemy :: struct {
 	move_speed:        f32,
 	move_max_velocity: f32,
 	is_on_ground:      bool,
+	behavior:          proc(self: ^Enemy, ctx: GameCtx),
+}
+
+simple_behavior :: proc(self: ^Enemy, ctx: GameCtx) {
+	player_pos := b2.Body_GetPosition(ctx.player.body_id)
+	self_pos := b2.Body_GetPosition(self.body_id)
+
+	if self_pos.x > player_pos.x {
+		enemy_move_left(self)
+	} else {
+		enemy_move_right(self)
+	}
+
+	if self_pos.y > player_pos.y {
+		enemy_jump(self)
+	}
+}
+
+enemy_move_right :: proc(enemy: ^Enemy) {
+	velocity := b2.Body_GetLinearVelocity(enemy.body_id).x
+	if velocity < 0 || abs(velocity) < enemy.move_max_velocity {
+		b2.Body_ApplyForceToCenter(enemy.body_id, {enemy.move_speed, 0}, true)
+	}
+}
+
+enemy_move_left :: proc(enemy: ^Enemy) {
+	velocity := b2.Body_GetLinearVelocity(enemy.body_id).x
+	if velocity > 0 || abs(velocity) < enemy.move_max_velocity {
+		b2.Body_ApplyForceToCenter(enemy.body_id, {-enemy.move_speed, 0}, true)
+	}
+}
+
+enemy_jump :: proc(enemy: ^Enemy) {
+	if enemy.is_on_ground {
+		b2.Body_ApplyLinearImpulseToCenter(enemy.body_id, {0, -UNIT * enemy.jump_speed}, true)
+	}
 }
 
 update_enemy :: proc(enemy: ^Enemy, contact_events: b2.ContactEvents) {
@@ -77,8 +113,9 @@ create_enemy :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (enemy: Enemy) {
 	enemy.body_id = body_id
 	enemy.shape_id = shape_id
 	enemy.jump_speed = 130 * UNIT
-	enemy.move_speed = 31572 * UNIT
-	enemy.move_max_velocity = 3 * UNIT
+	enemy.move_speed = 21395 * UNIT
+	enemy.move_max_velocity = 1.13 * UNIT
+	enemy.behavior = simple_behavior
 	return
 }
 
