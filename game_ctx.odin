@@ -29,11 +29,7 @@ spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.
 	bullet.direction = direction
 	b2.Shape_SetUserData(bullet.shape_id, &bullet.shape_id)
 	b2.Body_SetTransform(bullet.body_id, start_pos, {0, 0})
-	b2.Body_ApplyLinearImpulseToCenter(
-		bullet.body_id,
-		bullet.speed * bullet.direction,
-		true,
-	)
+	b2.Body_ApplyLinearImpulseToCenter(bullet.body_id, bullet.speed * bullet.direction, true)
 }
 
 new_game_ctx :: proc() -> (ctx: GameCtx) {

@@ -12,7 +12,8 @@ import mu "vendor:microui"
 import rl "vendor:raylib"
 
 WheelElement :: struct {
-	color: rl.Color,
+	color:  rl.Color,
+	sprite: Sprite,
 }
 
 Wheel :: struct {
@@ -37,10 +38,31 @@ create_wheel :: proc() -> (wheel: Wheel) {
 	wheel.radius = 175
 	wheel.impulse_speed = 260
 	wheel.friction = 0.60
-	for i in 0 ..< 16 {
-		append(&wheel.elements, WheelElement{color = rl.Color{u8(i * 40), 125, u8(i * 20), 255}})
-	}
 
+	selector := 0
+	for i in 0 ..< 16 {
+
+		sprite: Sprite
+		switch selector {
+		case 0:
+			sprite = new_cig()
+		case 1:
+			sprite = new_glass()
+		case 2:
+			sprite = new_sugar()
+		}
+
+		if selector == 2 {
+			selector = 0
+		} else {
+			selector += 1
+		}
+
+		append(
+			&wheel.elements,
+			WheelElement{color = rl.Color{u8(i * 40), 125, u8(i * 20), 255}, sprite = sprite},
+		)
+	}
 	wheel.good_sound = rl.LoadSound(GOOD_SPIN)
 	wheel.bad_sound = rl.LoadSound(BAD_SPIN)
 	wheel.volume_sound = 1
@@ -74,6 +96,10 @@ update_wheel :: proc(wheel: ^Wheel) {
 	}
 
 	wheel.is_sound_playing = rl.IsSoundPlaying(wheel.good_sound)
+
+	for &e in wheel.elements {
+		update_sprite(&e.sprite)
+	}
 }
 
 start_wheel :: proc(wheel: ^Wheel) {
@@ -82,16 +108,22 @@ start_wheel :: proc(wheel: ^Wheel) {
 		wheel.is_turning = true
 	}
 }
+
 render_wheel :: proc(wheel: Wheel) {
 	rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)
 
 	angle: f32 = 360 / f32(len(wheel.elements))
 	for element, i in wheel.elements {
 		angle_start: f32 = (angle * f32(i)) + wheel.angle
+		angle_sprite: f32 = (angle * f32(i) + (angle / 2)) + wheel.angle
 		angle_end: f32 = (angle * f32(i + 1)) + wheel.angle
 
 		x_start := wheel.radius * math.sin(f32(rl.DEG2RAD) * angle_start)
 		y_start := wheel.radius * math.cos(f32(rl.DEG2RAD) * angle_start)
+
+		sprite_radius := (wheel.radius - (wheel.radius / 4))
+		x_sprite := sprite_radius * math.sin(f32(rl.DEG2RAD) * angle_sprite)
+		y_sprite := sprite_radius * math.cos(f32(rl.DEG2RAD) * angle_sprite)
 
 		x_end := wheel.radius * math.sin(f32(rl.DEG2RAD) * angle_end)
 		y_end := wheel.radius * math.cos(f32(rl.DEG2RAD) * angle_end)
@@ -101,6 +133,12 @@ render_wheel :: proc(wheel: Wheel) {
 			{x_start, y_start} + wheel.position,
 			{x_end, y_end} + wheel.position,
 			element.color,
+		)
+
+		render_sprite(
+			element.sprite,
+			{x_sprite, y_sprite} +
+			(wheel.position - {element.sprite.rect.width / 2, element.sprite.rect.height / 2}),
 		)
 	}
 }
