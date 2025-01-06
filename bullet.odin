@@ -18,6 +18,10 @@ Bullet :: struct {
 	direction:  rl.Vector2,
 }
 
+common_bullet: Bullet = {
+	speed = 3000,
+}
+
 create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.shape_type = .BULLET_FROM_PLAYER
 	body := b2.DefaultBodyDef()
@@ -32,6 +36,7 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
 	bullet.body_id = body_id
 	bullet.shape_id = shape_id
+	bullet.speed = common_bullet.speed * UNIT
 	return
 }
 

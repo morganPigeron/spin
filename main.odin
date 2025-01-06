@@ -130,6 +130,15 @@ main :: proc() {
 		game_ctx.camera = camera
 	}
 
+
+	// temp sprites
+	cig := rl.LoadTexture(CIG)
+	sprite_rect := rl.Rectangle{0, 0, 32, 32}
+	sprite_img_count := 11
+	sprite_cursor := 0
+	sprite_current_time :f32= 0.0
+	sprite_frame_time :f32= 0.15
+
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
 
@@ -246,6 +255,18 @@ main :: proc() {
 				for bullet in game_ctx.bullets {
 					render_bullet(bullet)
 				}
+
+				sprite_current_time += rl.GetFrameTime()
+				if sprite_current_time > sprite_frame_time {
+					sprite_current_time = 0
+					if sprite_cursor >= sprite_img_count {
+						sprite_cursor = 0
+					} else {
+						sprite_cursor += 1
+					}
+					sprite_rect.x = sprite_rect.width * f32(sprite_cursor)
+				}
+				rl.DrawTextureRec(cig, sprite_rect, {30, 30}, rl.WHITE)
 			}
 
 			rl.DrawFPS(10, 10)

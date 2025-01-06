@@ -148,6 +148,10 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			bullets := &game_ctx.bullets
 			if len(bullets) > 0 {
 				mu.layout_row(ctx, {150, -1}, 0)
+				{ 	// speed slider 
+					mu.label(ctx, "speed: ")
+					mu.slider(ctx, &common_bullet.speed, 300, 10000)
+				}
 				{ 	// density slider
 					mu.label(ctx, "density (kg) ")
 					value := b2.Shape_GetDensity(bullets[0].shape_id)
