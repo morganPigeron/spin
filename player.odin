@@ -110,6 +110,7 @@ create_player :: proc(world_id: b2.WorldId) -> (player: Player) {
 	shape_def := b2.DefaultShapeDef()
 	shape_def.density = 1
 	shape_def.friction = 0.07
+	shape_def.enableHitEvents = true
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
 	player.body_id = body_id
 	player.shape_id = shape_id

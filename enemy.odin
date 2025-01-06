@@ -57,6 +57,18 @@ enemy_jump :: proc(enemy: ^Enemy) {
 }
 
 update_enemy :: proc(enemy: ^Enemy, contact_events: b2.ContactEvents) {
+
+	for i in 0 ..< contact_events.hitCount {
+		hit := contact_events.hitEvents[i]
+		a := transmute(^ShapeType)b2.Shape_GetUserData(hit.shapeIdA)
+		b := transmute(^ShapeType)b2.Shape_GetUserData(hit.shapeIdB)
+		if a^ == .BULLET_FROM_PLAYER && b^ == .ENEMY {
+			log.info("hit")
+		} else if a^ == .ENEMY && b^ == .BULLET_FROM_PLAYER {
+			log.info("hit")
+		}
+	}
+
 	for begin in contact_events.beginEvents[:contact_events.beginCount] {
 		a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
 		b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)
@@ -107,6 +119,7 @@ create_enemy :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (enemy: Enemy) {
 	enemy.extends = {UNIT / 4, UNIT / 2}
 	dynamic_box := b2.MakeBox(enemy.extends.x, enemy.extends.y)
 	shape_def := b2.DefaultShapeDef()
+	shape_def.enableHitEvents = true
 	shape_def.density = 1
 	shape_def.friction = 0.07
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)

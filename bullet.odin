@@ -32,6 +32,7 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.extends = {UNIT / 10, UNIT / 10}
 	dynamic_box := b2.MakeBox(bullet.extends.x, bullet.extends.y)
 	shape_def := b2.DefaultShapeDef()
+	shape_def.enableHitEvents = true
 	shape_def.density = 1
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
 	bullet.body_id = body_id
