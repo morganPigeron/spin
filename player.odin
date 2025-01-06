@@ -20,7 +20,7 @@ Player :: struct {
 	is_on_ground:      bool,
 }
 
-player_shoot :: proc(player: ^Player, ctx: ^GameCtx) {
+player_shoot :: proc(ctx: ^GameCtx) {
 	direction: rl.Vector2 = {0, 0}
 	if rl.IsKeyDown(ctx.key_inputs[.RIGHT]) {
 		direction.x = 1
@@ -34,7 +34,7 @@ player_shoot :: proc(player: ^Player, ctx: ^GameCtx) {
 		direction.y = 1
 	}
 
-	spawn_player_bullet(ctx, b2.Body_GetPosition(player.body_id), direction)
+	spawn_player_bullet(ctx, b2.Body_GetPosition(ctx.player.body_id), direction)
 }
 
 player_move_right :: proc(player: ^Player) {

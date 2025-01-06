@@ -143,6 +143,22 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.label(ctx, fmt.tprintf("%v", key))
 			}
 		}
+
+		if .ACTIVE in mu.header(ctx, "bullets") {
+			bullets := &game_ctx.bullets
+			if len(bullets) > 0 {
+				mu.layout_row(ctx, {150, -1}, 0)
+				{ 	// density slider
+					mu.label(ctx, "density (kg) ")
+					value := b2.Shape_GetDensity(bullets[0].shape_id)
+					mu.slider(ctx, &value, 0, 1)
+					for &b in game_ctx.bullets {
+						b2.Shape_SetDensity(b.shape_id, value)
+					}
+				}
+			}
+
+		}
 	}
 }
 

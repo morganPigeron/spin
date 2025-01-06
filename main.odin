@@ -96,30 +96,32 @@ main :: proc() {
 	state.screen_texture = rl.LoadRenderTexture(state.screen_width, state.screen_height)
 	defer rl.UnloadRenderTexture(state.screen_texture)
 
-	// box2d init
-	b2.SetLengthUnitsPerMeter(UNIT)
-	world := b2.DefaultWorldDef()
-	world.gravity = {0, 9.81 * UNIT}
-	world_id := b2.CreateWorld(world)
-	defer b2.DestroyWorld(world_id)
-	
 	// game ctx
 	game_ctx := new_game_ctx()
 	defer delete_game_ctx(game_ctx)
-	game_ctx.player = create_player(world_id)
+
+	// box2d init
+	{
+		b2.SetLengthUnitsPerMeter(UNIT)
+		world := b2.DefaultWorldDef()
+		world.gravity = {0, 9.81 * UNIT}
+		game_ctx.world_id = b2.CreateWorld(world)
+	}
+	
+	game_ctx.player = create_player(game_ctx.world_id)
 	//TODO the pointer to user data need to be always valid
 	b2.Shape_SetUserData(game_ctx.player.shape_id, &game_ctx.player.shape_type)
 	game_ctx.wheel = create_wheel()
 	defer delete_wheel(game_ctx.wheel)
 	
 	for i in 0 ..< 5 {
-		append(&game_ctx.enemies, create_enemy(world_id, {780, f32(UNIT * i)}))
+		append(&game_ctx.enemies, create_enemy(game_ctx.world_id, {780, f32(UNIT * i)}))
 		e := &game_ctx.enemies[len(game_ctx.enemies) - 1]
 		b2.Shape_SetUserData(e.shape_id, &e.shape_type)
 	}	
 
 	// ground
-	game_ctx.ground = create_ground(world_id)
+	game_ctx.ground = create_ground(game_ctx.world_id)
 	b2.Shape_SetUserData(game_ctx.ground.shape_id, &game_ctx.ground.shape_type)
 	
 	{
@@ -186,9 +188,9 @@ main :: proc() {
 		contact_events: b2.ContactEvents
 		{
 			dt := rl.GetFrameTime()
-			b2.World_Step(world_id, dt, 4)
+			b2.World_Step(game_ctx.world_id, dt, 4)
 
-			contact_events = b2.World_GetContactEvents(world_id)
+			contact_events = b2.World_GetContactEvents(game_ctx.world_id)
 		}
 
 		update_player(&game_ctx.player, contact_events)
@@ -205,6 +207,9 @@ main :: proc() {
 			}
 			if rl.IsKeyDown(game_ctx.key_inputs[.JUMP]) {
 				player_jump(&game_ctx.player)
+			}
+			if rl.IsKeyDown(game_ctx.key_inputs[.SHOOT]) {
+				player_shoot(&game_ctx)
 			}
 		}
 
@@ -238,6 +243,9 @@ main :: proc() {
 				}
 				render_wheel(game_ctx.wheel)
 				render_player(game_ctx.player)
+				for bullet in game_ctx.bullets {
+					render_bullet(bullet)
+				}
 			}
 
 			rl.DrawFPS(10, 10)

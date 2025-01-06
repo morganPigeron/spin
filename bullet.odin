@@ -22,10 +22,10 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.shape_type = .BULLET_FROM_PLAYER
 	body := b2.DefaultBodyDef()
 	body.type = .dynamicBody
+	body.position = {0, 0}
 	body.fixedRotation = true
-	body.position = {UNIT / 4, UNIT / 4}
 	body_id := b2.CreateBody(world_id, body)
-	bullet.extends = {UNIT / 4, UNIT / 2}
+	bullet.extends = {UNIT / 10, UNIT / 10}
 	dynamic_box := b2.MakeBox(bullet.extends.x, bullet.extends.y)
 	shape_def := b2.DefaultShapeDef()
 	shape_def.density = 1
@@ -33,4 +33,9 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.body_id = body_id
 	bullet.shape_id = shape_id
 	return
+}
+
+render_bullet :: proc(bullet: Bullet) {
+	pos := b2.Body_GetPosition(bullet.body_id)
+	rl.DrawCircleV(pos.xy, bullet.extends.x, rl.PURPLE)
 }
