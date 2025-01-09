@@ -27,6 +27,7 @@ GameCtx :: struct {
 	enemies:       [dynamic]Enemy,
 	bullets:       [dynamic]Bullet,
 	key_inputs:    [InputList]rl.KeyboardKey,
+	main_track:    Track,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
@@ -50,6 +51,7 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.SHOOT = .LEFT_CONTROL,
 	}
 	ctx.current_scene = .Menu
+	ctx.main_track = load_main_track()
 	return
 }
 

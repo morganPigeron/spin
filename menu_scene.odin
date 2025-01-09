@@ -3,12 +3,23 @@ package main
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
+import "core:log"
+
 setup_menu_scene :: proc(game_ctx: ^GameCtx) {
 	game_ctx.wheel.position = {f32(state.screen_width / 2), f32(state.screen_height / 2)}
+
+	if !rl.IsMusicValid(game_ctx.main_track.music) {
+		log.error("music is not valid")
+	}
+	if !rl.IsMusicStreamPlaying(game_ctx.main_track.music) {
+		rl.PlayMusicStream(game_ctx.main_track.music)
+	}
+
 	start_wheel(&game_ctx.wheel)
 }
 
 update_menu_scene :: proc(game_ctx: ^GameCtx) {
+	rl.UpdateMusicStream(game_ctx.main_track.music)
 	update_wheel(&game_ctx.wheel)
 }
 

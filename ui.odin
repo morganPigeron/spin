@@ -144,6 +144,21 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			}
 		}
 
+		if .ACTIVE in mu.header(ctx, "sounds") {
+			wheel := &game_ctx.wheel
+			{ 	// wheel sound volume slider
+				mu.label(ctx, "wheel volume: ")
+				mu.slider(ctx, &wheel.volume_sound, 0, 1)
+				rl.SetSoundVolume(wheel.bad_sound, wheel.volume_sound)
+				rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
+			}
+			{ 	// main sound volume slider
+				mu.label(ctx, "main theme volume: ")
+				@(static) value: f32 = 1
+				mu.slider(ctx, &value, 0, 1)
+				rl.SetMusicVolume(game_ctx.main_track.music, value)
+			}
+		}
 		if .ACTIVE in mu.header(ctx, "bullets") {
 			bullets := &game_ctx.bullets
 			if len(bullets) > 0 {
