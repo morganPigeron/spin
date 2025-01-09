@@ -12,7 +12,12 @@ InputList :: enum {
 	SHOOT,
 }
 
+Scenes :: enum {
+	Test
+}
+
 GameCtx :: struct {
+	current_scene: Scenes,
 	world_id:   b2.WorldId,
 	camera:     rl.Camera2D,
 	player:     Player,
@@ -55,4 +60,5 @@ delete_game_ctx :: proc(ctx: GameCtx) {
 	}
 	delete(ctx.enemies)
 	delete(ctx.bullets)
+	delete_wheel(ctx.wheel)
 }

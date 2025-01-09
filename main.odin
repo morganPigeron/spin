@@ -7,8 +7,8 @@ import "core:strings"
 import "core:unicode/utf8"
 
 import b2 "vendor:box2d"
-import rl "vendor:raylib"
 import mu "vendor:microui"
+import rl "vendor:raylib"
 
 ShapeType :: enum {
 	PLAYER,
@@ -18,8 +18,8 @@ ShapeType :: enum {
 }
 
 UNIT :: 64 // 64 px => 1m
-INITIAL_SCREEN_WIDTH :: 800
-INITIAL_SCREEN_HEIGHT :: 600
+INITIAL_SCREEN_WIDTH :: 1280
+INITIAL_SCREEN_HEIGHT :: 720
 main :: proc() {
 	context.logger = log.create_console_logger()
 
@@ -48,7 +48,7 @@ main :: proc() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
-	rl.InitAudioDevice()      
+	rl.InitAudioDevice()
 
 	// connect clipboard with microui
 	ctx := &state.mu_ctx
@@ -107,28 +107,8 @@ main :: proc() {
 		world.gravity = {0, 9.81 * UNIT}
 		game_ctx.world_id = b2.CreateWorld(world)
 	}
-	
-	game_ctx.player = create_player(game_ctx.world_id)
-	//TODO the pointer to user data need to be always valid
-	b2.Shape_SetUserData(game_ctx.player.shape_id, &game_ctx.player.shape_type)
-	game_ctx.wheel = create_wheel()
-	defer delete_wheel(game_ctx.wheel)
-	
-	for i in 0 ..< 5 {
-		append(&game_ctx.enemies, create_enemy(game_ctx.world_id, {780, f32(UNIT * i)}))
-		e := &game_ctx.enemies[len(game_ctx.enemies) - 1]
-		b2.Shape_SetUserData(e.shape_id, &e.shape_type)
-	}	
 
-	// ground
-	game_ctx.ground = create_ground(game_ctx.world_id)
-	b2.Shape_SetUserData(game_ctx.ground.shape_id, &game_ctx.ground.shape_type)
-	
-	{
-		camera := rl.Camera2D{}// camera
-		camera.zoom = 1
-		game_ctx.camera = camera
-	}
+	setup_test_scene(&game_ctx)
 
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
@@ -136,9 +116,13 @@ main :: proc() {
 		if rl.IsWindowResized() {
 			state.screen_width = rl.GetScreenWidth()
 			state.screen_height = rl.GetScreenHeight()
+			game_ctx.camera.zoom = min(
+				f32(state.screen_width) / INITIAL_SCREEN_WIDTH, 
+				f32(state.screen_height) / INITIAL_SCREEN_HEIGHT
+			)
 		}
-		
-		{ // micro ui
+
+		{ 	// micro ui
 			// connect mouse input
 			mouse_pos := rl.GetMousePosition()
 			mouse_x, mouse_y := i32(mouse_pos.x), i32(mouse_pos.y)
@@ -183,37 +167,12 @@ main :: proc() {
 				mu.input_text(ctx, string(buf[:n]))
 			}
 		}
-		
 
-		contact_events: b2.ContactEvents
-		{
-			dt := rl.GetFrameTime()
-			b2.World_Step(game_ctx.world_id, dt, 4)
-
-			contact_events = b2.World_GetContactEvents(game_ctx.world_id)
+		switch game_ctx.current_scene {
+			case .Test: 
+				update_test_scene(&game_ctx)
 		}
 
-		update_player(&game_ctx.player, contact_events)
-		for &enemy in game_ctx.enemies {
-			update_enemy(&enemy, contact_events)
-			enemy.behavior(&enemy, game_ctx)
-		}
-
-		{ 	//update
-			if rl.IsKeyDown(game_ctx.key_inputs[.RIGHT]) {
-				player_move_right(&game_ctx.player)
-			} else if rl.IsKeyDown(game_ctx.key_inputs[.LEFT]) {
-				player_move_left(&game_ctx.player)
-			}
-			if rl.IsKeyDown(game_ctx.key_inputs[.JUMP]) {
-				player_jump(&game_ctx.player)
-			}
-			if rl.IsKeyDown(game_ctx.key_inputs[.SHOOT]) {
-				player_shoot(&game_ctx)
-			}
-		}
-
-		update_wheel(&game_ctx.wheel)
 
 		{ 	// update mico ui 
 			if rl.IsWindowResized() {
@@ -228,27 +187,16 @@ main :: proc() {
 			mu.end(ctx)
 		}
 
-		{ 	//rendering
+		{
 			rl.BeginDrawing()
 			defer rl.EndDrawing()
 			rl.ClearBackground(rl.RAYWHITE)
 
-			{
-				rl.BeginMode2D(game_ctx.camera)
-				defer rl.EndMode2D()
-
-				render_ground(game_ctx.ground)
-				for &enemy in game_ctx.enemies {
-					render_enemy(enemy)
-				}
-				render_wheel(game_ctx.wheel)
-				render_player(game_ctx.player)
-				for bullet in game_ctx.bullets {
-					render_bullet(bullet)
-				}
+			switch game_ctx.current_scene {
+				case .Test: 
+					render_test_scene(&game_ctx)
 			}
 
-			rl.DrawFPS(10, 10)
 			render(ctx)
 		}
 	}
