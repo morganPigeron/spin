@@ -107,9 +107,10 @@ main :: proc() {
 		world.gravity = {0, 9.81 * UNIT}
 		game_ctx.world_id = b2.CreateWorld(world)
 	}
-
-	setup_test_scene(&game_ctx)
-
+	
+	setup_common_scene(&game_ctx)
+	setup_menu_scene(&game_ctx)
+	
 	for !rl.WindowShouldClose() {
 		free_all(context.temp_allocator)
 
@@ -171,6 +172,8 @@ main :: proc() {
 		switch game_ctx.current_scene {
 			case .Test: 
 				update_test_scene(&game_ctx)
+			case .Menu:
+				update_menu_scene(&game_ctx)
 		}
 
 
@@ -195,6 +198,8 @@ main :: proc() {
 			switch game_ctx.current_scene {
 				case .Test: 
 					render_test_scene(&game_ctx)
+				case .Menu:
+					render_menu_scene(&game_ctx)
 			}
 
 			render(ctx)

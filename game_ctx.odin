@@ -13,19 +13,20 @@ InputList :: enum {
 }
 
 Scenes :: enum {
-	Test
+	Menu,
+	Test,
 }
 
 GameCtx :: struct {
 	current_scene: Scenes,
-	world_id:   b2.WorldId,
-	camera:     rl.Camera2D,
-	player:     Player,
-	wheel:      Wheel,
-	ground:     Ground,
-	enemies:    [dynamic]Enemy,
-	bullets:    [dynamic]Bullet,
-	key_inputs: [InputList]rl.KeyboardKey,
+	world_id:      b2.WorldId,
+	camera:        rl.Camera2D,
+	player:        Player,
+	wheel:         Wheel,
+	ground:        Ground,
+	enemies:       [dynamic]Enemy,
+	bullets:       [dynamic]Bullet,
+	key_inputs:    [InputList]rl.KeyboardKey,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
@@ -48,6 +49,7 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.JUMP  = .SPACE,
 		.SHOOT = .LEFT_CONTROL,
 	}
+	ctx.current_scene = .Menu
 	return
 }
 
@@ -61,4 +63,13 @@ delete_game_ctx :: proc(ctx: GameCtx) {
 	delete(ctx.enemies)
 	delete(ctx.bullets)
 	delete_wheel(ctx.wheel)
+}
+
+change_scene :: proc(ctx: ^GameCtx, new_scene: Scenes) {
+	switch new_scene {
+	case .Menu:
+	case .Test:
+		setup_test_scene(ctx)
+		ctx.current_scene = .Test
+	}
 }

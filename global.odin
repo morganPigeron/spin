@@ -18,8 +18,8 @@ state := struct {
 	screen_height:  c.int,
 	screen_texture: rl.RenderTexture2D,
 } {
-	screen_width  = 1280,
-	screen_height = 720,
+	screen_width  = INITIAL_SCREEN_WIDTH,
+	screen_height = INITIAL_SCREEN_HEIGHT,
 	bg            = {90, 95, 100, 255},
 }
 
