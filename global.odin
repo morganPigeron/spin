@@ -23,10 +23,6 @@ state := struct {
 	bg            = {90, 95, 100, 255},
 }
 
-debug_state := struct {
-	allocator: ^mem.Tracking_Allocator,
-}{}
-
 mouse_buttons_map := [mu.Mouse]rl.MouseButton {
 	.LEFT   = .LEFT,
 	.RIGHT  = .RIGHT,
@@ -48,12 +44,4 @@ key_map := [mu.Key][2]rl.KeyboardKey {
 	.X         = {.X, .KEY_NULL},
 	.C         = {.C, .KEY_NULL},
 	.V         = {.V, .KEY_NULL},
-}
-
-world_grid := struct {
-	spacing: f32,
-	size:    f32,
-} {
-	spacing = 0.25,
-	size    = 50,
 }
