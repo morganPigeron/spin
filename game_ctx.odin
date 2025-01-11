@@ -1,3 +1,5 @@
+#+feature dynamic-literals
+
 package main
 
 import b2 "vendor:box2d"
@@ -21,21 +23,25 @@ Scenes :: enum {
 EditorMode :: enum {
 	None,
 	PlaceGround,
+	PlaceImage,
 }
 
 GameCtx :: struct {
-	current_scene: Scenes,
-	world_id:      b2.WorldId,
-	camera:        rl.Camera2D,
-	player:        Player,
-	wheel:         Wheel,
-	grounds:       [dynamic]Ground,
-	enemies:       [dynamic]Enemy,
-	bullets:       [dynamic]Bullet,
-	key_inputs:    [InputList]rl.KeyboardKey,
-	main_track:    Track,
-	is_editor:     bool,
-	editor_mode:   EditorMode,
+	current_scene:  Scenes,
+	world_id:       b2.WorldId,
+	camera:         rl.Camera2D,
+	player:         Player,
+	wheel:          Wheel,
+	grounds:        [dynamic]Ground,
+	images:         [dynamic]Image,
+	enemies:        [dynamic]Enemy,
+	bullets:        [dynamic]Bullet,
+	key_inputs:     [InputList]rl.KeyboardKey,
+	main_track:     Track,
+	is_editor:      bool,
+	editor_mode:    EditorMode,
+	assets:         map[Assets]rl.Texture2D,
+	selected_asset: Assets,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
@@ -50,6 +56,7 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	ctx.enemies = make([dynamic]Enemy, 0, 100)
 	ctx.bullets = make([dynamic]Bullet, 0, 100)
 	ctx.grounds = make([dynamic]Ground, 0, 100)
+	ctx.images = make([dynamic]Image, 0, 100)
 	ctx.key_inputs = {
 		.UP            = .W,
 		.DOWN          = .S,
@@ -61,6 +68,13 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	}
 	ctx.current_scene = .Menu
 	ctx.main_track = load_main_track()
+
+	ctx.assets = {
+		.PLANT   = rl.LoadTexture(PLANT),
+		.GLASSES = rl.LoadTexture(GLASSES),
+		.CIG     = rl.LoadTexture(CIG),
+		.SUGAR   = rl.LoadTexture(SUGAR),
+	}
 	return
 }
 
@@ -74,6 +88,8 @@ delete_game_ctx :: proc(ctx: GameCtx) {
 	delete(ctx.enemies)
 	delete(ctx.bullets)
 	delete(ctx.grounds)
+	delete(ctx.assets)
+	delete(ctx.images)
 	delete_wheel(ctx.wheel)
 }
 

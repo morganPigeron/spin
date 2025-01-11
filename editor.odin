@@ -54,17 +54,17 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			defer rl.EndMode2D()
 
 			// GRID
-			a := nearest_grid_pos(top_left.xy, GRID_SPACING)
-			b := nearest_grid_pos(bottom_right.xy, GRID_SPACING)
-			for i := min(0, a.x); i < b.x; i += GRID_SPACING {
+			a := nearest_grid_pos(top_left.xy, grid_spacing)
+			b := nearest_grid_pos(bottom_right.xy, grid_spacing)
+			for i := min(0, a.x); i < b.x; i += grid_spacing {
 				start: rl.Vector2 = {i, a.y}
 				end: rl.Vector2 = {i, b.y}
-				rl.DrawLineEx(start, end, 2, rl.GRAY)
+				rl.DrawLineEx(start, end, 1, rl.GRAY)
 			}
-			for i := min(0, a.y); i < b.y; i += GRID_SPACING {
+			for i := min(0, a.y); i < b.y; i += grid_spacing {
 				start: rl.Vector2 = {a.x, i}
 				end: rl.Vector2 = {b.x, i}
-				rl.DrawLineEx(start, end, 2, rl.GRAY)
+				rl.DrawLineEx(start, end, 1, rl.GRAY)
 			}
 
 			// PLAYERVIEW
@@ -83,35 +83,68 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			)
 			rl.DrawLineEx({0, INITIAL_SCREEN_HEIGHT} + cam, {0, 0} + cam, 4, rl.PURPLE)
 
-			if game_ctx.editor_mode == .PlaceGround {
-				pos: rl.Vector2 = nearest_grid_pos(mouse.xy, GRID_SPACING)
+			pos: rl.Vector2 = nearest_grid_pos(mouse.xy, grid_spacing)
+			switch game_ctx.editor_mode {
+			case .PlaceImage:
+				rl.DrawTextureV(game_ctx.assets[.PLANT], pos, rl.WHITE)
+			case .PlaceGround:
 				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
+			case .None:
 			}
 		}
 
 		{ 	//screen space
 			BUTTON_SIZE: rl.Vector2 : {150, 30}
+			PADDING :: 30
 			if game_ctx.editor_mode == .None {
 				if rl.GuiButton(
 					{screen.x - BUTTON_SIZE.x - 150, 150, BUTTON_SIZE.x, BUTTON_SIZE.y},
 					"place ground",
 				) {
 					game_ctx.editor_mode = .PlaceGround
+					grid_spacing = UNIT
+				}
+
+				if rl.GuiButton(
+					{
+						screen.x - BUTTON_SIZE.x - 150,
+						150 + BUTTON_SIZE.y + PADDING,
+						BUTTON_SIZE.x,
+						BUTTON_SIZE.y,
+					},
+					"place image",
+				) {
+					game_ctx.editor_mode = .PlaceImage
+					game_ctx.selected_asset = .PLANT
+					grid_spacing = 8
 				}
 			} else if rl.IsMouseButtonPressed(.RIGHT) {
 				game_ctx.editor_mode = .None
 			}
 
-			if game_ctx.editor_mode == .PlaceGround {
+			switch game_ctx.editor_mode {
+			case .PlaceImage:
+				if rl.IsMouseButtonPressed(.LEFT) {
+					append(
+						&game_ctx.images,
+						create_image(
+							game_ctx^,
+							nearest_grid_pos(mouse.xy, grid_spacing),
+							game_ctx.selected_asset,
+						),
+					)
+				}
+			case .PlaceGround:
 				if rl.IsMouseButtonPressed(.LEFT) {
 					append(
 						&game_ctx.grounds,
 						create_ground(
 							game_ctx.world_id,
-							nearest_grid_pos(mouse.xy, GRID_SPACING) + UNIT / 2,
+							nearest_grid_pos(mouse.xy, grid_spacing) + UNIT / 2,
 						),
 					)
 				}
+			case .None:
 			}
 		}
 	}

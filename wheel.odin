@@ -32,7 +32,7 @@ Wheel :: struct {
 	volume_sound:       f32,
 }
 
-create_wheel :: proc() -> (wheel: Wheel) {
+create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 	wheel.elements = make([dynamic]WheelElement, 0, 16)
 	wheel.position = {175 + 20, 175 + 20}
 	wheel.radius = 175
@@ -45,11 +45,11 @@ create_wheel :: proc() -> (wheel: Wheel) {
 		sprite: Sprite
 		switch selector {
 		case 0:
-			sprite = new_cig()
+			sprite = new_cig(ctx)
 		case 1:
-			sprite = new_glass()
+			sprite = new_glass(ctx)
 		case 2:
-			sprite = new_sugar()
+			sprite = new_sugar(ctx)
 		}
 
 		if selector == 2 {

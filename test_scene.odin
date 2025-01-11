@@ -48,6 +48,9 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 		for ground in game_ctx.grounds {
 			render_ground(ground)
 		}
+		for image in game_ctx.images {
+			render_image(image)
+		}
 		for &enemy in game_ctx.enemies {
 			render_enemy(enemy)
 		}

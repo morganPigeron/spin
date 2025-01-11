@@ -58,8 +58,8 @@ ShapeTypePlayer := ShapeType.PLAYER
 ShapeTypeEnemy := ShapeType.ENEMY
 ShapeTypeBulletFromPlayer := ShapeType.BULLET_FROM_PLAYER
 
-UNIT :: 64 // 64 px => 1m
+UNIT :: 64 // px => 1m
 INITIAL_SCREEN_WIDTH :: 1280
 INITIAL_SCREEN_HEIGHT :: 720
 DEFAULT_VOLUME :: 0.1
-GRID_SPACING :: UNIT
+grid_spacing: f32 = UNIT

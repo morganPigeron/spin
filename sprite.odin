@@ -13,8 +13,8 @@ Sprite :: struct {
 	ping_pong:    bool,
 }
 
-new_cig :: proc() -> (result: Sprite) {
-	result.texture = rl.LoadTexture(CIG)
+new_cig :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.CIG]
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 11
 	result.frame_cursor = 0
@@ -24,8 +24,8 @@ new_cig :: proc() -> (result: Sprite) {
 	return
 }
 
-new_glass :: proc() -> (result: Sprite) {
-	result.texture = rl.LoadTexture(GLASSES)
+new_glass :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.GLASSES]
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 10
 	result.frame_cursor = 0
@@ -36,8 +36,8 @@ new_glass :: proc() -> (result: Sprite) {
 	return
 }
 
-new_sugar :: proc() -> (result: Sprite) {
-	result.texture = rl.LoadTexture(SUGAR)
+new_sugar :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.SUGAR]
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 9
 	result.frame_cursor = 0

@@ -5,7 +5,7 @@ import rl "vendor:raylib"
 
 setup_common_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.player = create_player(game_ctx.world_id)
-	game_ctx.wheel = create_wheel()
+	game_ctx.wheel = create_wheel(game_ctx^)
     
 	for i in 0 ..< 5 {
 		append(&game_ctx.enemies, create_enemy(game_ctx.world_id, {780, f32(UNIT * i)}))
