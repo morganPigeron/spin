@@ -11,10 +11,14 @@ CIG :: "assets/GJ1_cig.png"
 SUGAR :: "assets/GJ1_sugar.png"
 
 PLANT :: "assets/GJ1_plant1_OL.png"
+CUBICLE :: "assets/GJ1_cubicle.png"
+CHARACTER :: "assets/mainchara.png"
 
 Assets :: enum {
 	GLASSES,
 	CIG,
 	SUGAR,
 	PLANT,
+	CUBICLE,
+	CHARACTER,
 }

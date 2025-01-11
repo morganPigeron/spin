@@ -18,6 +18,7 @@ Player :: struct {
 	move_speed:        f32,
 	move_max_velocity: f32,
 	is_on_ground:      bool,
+	image:             Image,
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
@@ -79,11 +80,16 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 			player.is_on_ground = false
 		}
 	}
+
+	pos := b2.Body_GetPosition(player.body_id)
+	player.image.pos =
+		pos - ({f32(player.image.texture.width), f32(player.image.texture.height)} / 2)
 }
 
 render_player :: proc(player: Player) {
 	pos := b2.Body_GetPosition(player.body_id)
 	rot := b2.Body_GetRotation(player.body_id)
+	/*
 	rl.DrawRectanglePro(
 		{
 			pos.x - player.extends.x,
@@ -95,16 +101,18 @@ render_player :: proc(player: Player) {
 		b2.Rot_GetAngle(rot) * rl.RAD2DEG,
 		rl.BLUE,
 	)
+	*/
+	render_image(player.image)
 	rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
 }
 
-create_player :: proc(world_id: b2.WorldId) -> (player: Player) {
+create_player :: proc(ctx: GameCtx) -> (player: Player) {
 	player.shape_type = .PLAYER
 	body := b2.DefaultBodyDef()
 	body.type = .dynamicBody
 	body.position = {f32(rl.GetScreenWidth()) / 2, -4}
 	body.fixedRotation = true
-	body_id := b2.CreateBody(world_id, body)
+	body_id := b2.CreateBody(ctx.world_id, body)
 	player.extends = {UNIT / 4, UNIT / 2}
 	dynamic_box := b2.MakeBox(player.extends.x, player.extends.y)
 	shape_def := b2.DefaultShapeDef()
@@ -118,5 +126,6 @@ create_player :: proc(world_id: b2.WorldId) -> (player: Player) {
 	player.move_speed = 31572 * UNIT
 	player.move_max_velocity = 3 * UNIT
 	b2.Shape_SetUserData(shape_id, &ShapeTypePlayer)
+	player.image = create_image(ctx, body.position, .CHARACTER)
 	return
 }

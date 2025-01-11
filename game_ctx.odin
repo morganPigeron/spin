@@ -71,10 +71,12 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	ctx.main_track = load_main_track()
 
 	ctx.assets = {
-		.PLANT   = rl.LoadTexture(PLANT),
-		.GLASSES = rl.LoadTexture(GLASSES),
-		.CIG     = rl.LoadTexture(CIG),
-		.SUGAR   = rl.LoadTexture(SUGAR),
+		.PLANT     = rl.LoadTexture(PLANT),
+		.GLASSES   = rl.LoadTexture(GLASSES),
+		.CIG       = rl.LoadTexture(CIG),
+		.SUGAR     = rl.LoadTexture(SUGAR),
+		.CUBICLE   = rl.LoadTexture(CUBICLE),
+		.CHARACTER = rl.LoadTexture(CHARACTER),
 	}
 	return
 }

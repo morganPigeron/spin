@@ -4,7 +4,7 @@ import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
 setup_common_scene :: proc(game_ctx: ^GameCtx) {
-    game_ctx.player = create_player(game_ctx.world_id)
+    game_ctx.player = create_player(game_ctx^)
 	game_ctx.wheel = create_wheel(game_ctx^)
     
 	for i in 0 ..< 5 {

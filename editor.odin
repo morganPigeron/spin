@@ -87,7 +87,7 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			pos: rl.Vector2 = nearest_grid_pos(mouse.xy, grid_spacing)
 			switch game_ctx.editor_mode {
 			case .PlaceImage:
-				rl.DrawTextureV(game_ctx.assets[.PLANT], pos, rl.WHITE)
+				rl.DrawTextureV(game_ctx.assets[game_ctx.selected_asset], pos, rl.WHITE)
 			case .PlaceGround:
 				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
 			case .None:
@@ -98,51 +98,40 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			BUTTON_SIZE: rl.Vector2 : {150, 30}
 			PADDING :: 30
 			if game_ctx.editor_mode == .None {
-				if rl.GuiButton(
-					{screen.x - BUTTON_SIZE.x - 150, 150, BUTTON_SIZE.x, BUTTON_SIZE.y},
-					"place ground",
-				) {
+				button_rect: rl.Rectangle = {
+					screen.x - BUTTON_SIZE.x - 150,
+					150,
+					BUTTON_SIZE.x,
+					BUTTON_SIZE.y,
+				}
+				if rl.GuiButton(button_rect, "place ground") {
 					game_ctx.editor_mode = .PlaceGround
 					grid_spacing = UNIT
 				}
 
-				if rl.GuiButton(
-					{
-						screen.x - BUTTON_SIZE.x - 150,
-						150 + BUTTON_SIZE.y + PADDING,
-						BUTTON_SIZE.x,
-						BUTTON_SIZE.y,
-					},
-					"place image",
-				) {
+				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "place plant") {
 					game_ctx.editor_mode = .PlaceImage
 					game_ctx.selected_asset = .PLANT
 					grid_spacing = 8
 				}
 
-				if rl.GuiButton(
-					{
-						screen.x - BUTTON_SIZE.x - 150,
-						150 * 2 + BUTTON_SIZE.y + PADDING,
-						BUTTON_SIZE.x,
-						BUTTON_SIZE.y,
-					},
-					"save",
-				) {
+				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "place cubicle") {
+					game_ctx.editor_mode = .PlaceImage
+					game_ctx.selected_asset = .CUBICLE
+					grid_spacing = 8
+				}
+
+				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "save") {
 					save := serialize_ctx_v1(game_ctx)
 					defer delete(save)
 					os.write_entire_file("save.spin", save)
 				}
 
-				if rl.GuiButton(
-					{
-						screen.x - BUTTON_SIZE.x - 150,
-						150 * 3 + BUTTON_SIZE.y + PADDING,
-						BUTTON_SIZE.x,
-						BUTTON_SIZE.y,
-					},
-					"load",
-				) {
+				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "load") {
 					save, ok := os.read_entire_file_from_filename("save.spin")
 					defer delete(save)
 					if ok {
