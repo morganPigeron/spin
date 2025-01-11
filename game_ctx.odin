@@ -29,7 +29,7 @@ GameCtx :: struct {
 	camera:        rl.Camera2D,
 	player:        Player,
 	wheel:         Wheel,
-	ground:        Ground,
+	grounds:       [dynamic]Ground,
 	enemies:       [dynamic]Enemy,
 	bullets:       [dynamic]Bullet,
 	key_inputs:    [InputList]rl.KeyboardKey,
@@ -49,6 +49,7 @@ spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.
 new_game_ctx :: proc() -> (ctx: GameCtx) {
 	ctx.enemies = make([dynamic]Enemy, 0, 100)
 	ctx.bullets = make([dynamic]Bullet, 0, 100)
+	ctx.grounds = make([dynamic]Ground, 0, 100)
 	ctx.key_inputs = {
 		.UP            = .W,
 		.DOWN          = .S,
@@ -72,6 +73,7 @@ delete_game_ctx :: proc(ctx: GameCtx) {
 	}
 	delete(ctx.enemies)
 	delete(ctx.bullets)
+	delete(ctx.grounds)
 	delete_wheel(ctx.wheel)
 }
 

@@ -1,5 +1,6 @@
 package main
 
+import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
 import "core:math"
@@ -47,7 +48,7 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 		cam: rl.Vector2 = game_ctx.camera.target
 		top_left := rl.GetScreenToWorld2D({0, 0}, game_ctx.camera)
 		bottom_right := rl.GetScreenToWorld2D(screen, game_ctx.camera)
-
+		mouse := rl.GetScreenToWorld2D(rl.GetMousePosition(), game_ctx.camera)
 		{ 	// world space
 			rl.BeginMode2D(game_ctx.camera)
 			defer rl.EndMode2D()
@@ -82,7 +83,6 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			)
 			rl.DrawLineEx({0, INITIAL_SCREEN_HEIGHT} + cam, {0, 0} + cam, 4, rl.PURPLE)
 
-			mouse := rl.GetScreenToWorld2D(rl.GetMousePosition(), game_ctx.camera)
 			if game_ctx.editor_mode == .PlaceGround {
 				pos: rl.Vector2 = nearest_grid_pos(mouse.xy, GRID_SPACING)
 				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
@@ -100,6 +100,18 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				}
 			} else if rl.IsMouseButtonPressed(.RIGHT) {
 				game_ctx.editor_mode = .None
+			}
+
+			if game_ctx.editor_mode == .PlaceGround {
+				if rl.IsMouseButtonPressed(.LEFT) {
+					append(
+						&game_ctx.grounds,
+						create_ground(
+							game_ctx.world_id,
+							nearest_grid_pos(mouse.xy, GRID_SPACING) + UNIT / 2,
+						),
+					)
+				}
 			}
 		}
 	}

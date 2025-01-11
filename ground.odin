@@ -17,10 +17,10 @@ Ground :: struct {
 	shape_type: ShapeType,
 }
 
-create_ground :: proc(world_id: b2.WorldId) -> (ground: Ground) {
+create_ground :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (ground: Ground) {
 	ground.shape_type = .GROUND
 	ground_body := b2.DefaultBodyDef()
-	ground_body.position = {f32(rl.GetScreenWidth()) / 2, f32(rl.GetScreenHeight()) + UNIT / 2}
+	ground_body.position = pos
 	ground_body_id := b2.CreateBody(world_id, ground_body)
 	ground.extends = {UNIT / 2, UNIT / 2}
 	ground_box := b2.MakeBox(ground.extends.x, ground.extends.y)

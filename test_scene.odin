@@ -45,7 +45,9 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 		rl.BeginMode2D(game_ctx.camera)
 		defer rl.EndMode2D()
 
-		render_ground(game_ctx.ground)
+		for ground in game_ctx.grounds {
+			render_ground(ground)
+		}
 		for &enemy in game_ctx.enemies {
 			render_enemy(enemy)
 		}

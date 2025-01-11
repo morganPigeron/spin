@@ -12,7 +12,7 @@ setup_common_scene :: proc(game_ctx: ^GameCtx) {
 	}	
 
 	// ground
-	game_ctx.ground = create_ground(game_ctx.world_id)
+	//game_ctx.ground = create_ground(game_ctx.world_id)
 	
 	{
 		camera := rl.Camera2D{}// camera
