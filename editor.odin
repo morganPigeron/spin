@@ -91,11 +91,15 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 
 		{ 	//screen space
 			BUTTON_SIZE: rl.Vector2 : {150, 30}
-			if rl.GuiButton(
-				{screen.x - BUTTON_SIZE.x - 150, 150, BUTTON_SIZE.x, BUTTON_SIZE.y},
-				"place ground",
-			) {
-				game_ctx.editor_mode = .PlaceGround
+			if game_ctx.editor_mode == .None {
+				if rl.GuiButton(
+					{screen.x - BUTTON_SIZE.x - 150, 150, BUTTON_SIZE.x, BUTTON_SIZE.y},
+					"place ground",
+				) {
+					game_ctx.editor_mode = .PlaceGround
+				}
+			} else if rl.IsMouseButtonPressed(.RIGHT) {
+				game_ctx.editor_mode = .None
 			}
 		}
 	}
