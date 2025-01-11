@@ -17,6 +17,10 @@ Ground :: struct {
 	shape_type: ShapeType,
 }
 
+delete_ground :: proc(ground: Ground) {
+	b2.DestroyBody(ground.body_id)
+}
+
 create_ground :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (ground: Ground) {
 	ground.shape_type = .GROUND
 	ground_body := b2.DefaultBodyDef()

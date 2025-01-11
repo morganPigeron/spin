@@ -4,6 +4,7 @@ import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
 import "core:math"
+import "core:os"
 
 enter_editor :: proc(game_ctx: ^GameCtx) {
 
@@ -117,6 +118,36 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 					game_ctx.editor_mode = .PlaceImage
 					game_ctx.selected_asset = .PLANT
 					grid_spacing = 8
+				}
+
+				if rl.GuiButton(
+					{
+						screen.x - BUTTON_SIZE.x - 150,
+						150 * 2 + BUTTON_SIZE.y + PADDING,
+						BUTTON_SIZE.x,
+						BUTTON_SIZE.y,
+					},
+					"save",
+				) {
+					save := serialize_ctx_v1(game_ctx)
+					defer delete(save)
+					os.write_entire_file("save.spin", save)
+				}
+
+				if rl.GuiButton(
+					{
+						screen.x - BUTTON_SIZE.x - 150,
+						150 * 3 + BUTTON_SIZE.y + PADDING,
+						BUTTON_SIZE.x,
+						BUTTON_SIZE.y,
+					},
+					"load",
+				) {
+					save, ok := os.read_entire_file_from_filename("save.spin")
+					defer delete(save)
+					if ok {
+						deserialize_ctx(game_ctx, save)
+					}
 				}
 			} else if rl.IsMouseButtonPressed(.RIGHT) {
 				game_ctx.editor_mode = .None
