@@ -10,11 +10,17 @@ InputList :: enum {
 	RIGHT,
 	JUMP,
 	SHOOT,
+	TOGGLE_EDITOR,
 }
 
 Scenes :: enum {
 	Menu,
 	Test,
+}
+
+EditorMode :: enum {
+	None,
+	PlaceGround,
 }
 
 GameCtx :: struct {
@@ -28,13 +34,14 @@ GameCtx :: struct {
 	bullets:       [dynamic]Bullet,
 	key_inputs:    [InputList]rl.KeyboardKey,
 	main_track:    Track,
+	is_editor:     bool,
+	editor_mode:   EditorMode,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
 	append(&ctx.bullets, create_bullet_from_player(ctx.world_id))
 	bullet := &ctx.bullets[len(ctx.bullets) - 1]
 	bullet.direction = direction
-	b2.Shape_SetUserData(bullet.shape_id, &bullet.shape_type)
 	b2.Body_SetTransform(bullet.body_id, start_pos, {0, 0})
 	b2.Body_ApplyLinearImpulseToCenter(bullet.body_id, bullet.speed * bullet.direction, true)
 }
@@ -43,12 +50,13 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	ctx.enemies = make([dynamic]Enemy, 0, 100)
 	ctx.bullets = make([dynamic]Bullet, 0, 100)
 	ctx.key_inputs = {
-		.UP    = .W,
-		.DOWN  = .S,
-		.LEFT  = .A,
-		.RIGHT = .D,
-		.JUMP  = .SPACE,
-		.SHOOT = .LEFT_CONTROL,
+		.UP            = .W,
+		.DOWN          = .S,
+		.LEFT          = .A,
+		.RIGHT         = .D,
+		.JUMP          = .SPACE,
+		.SHOOT         = .LEFT_CONTROL,
+		.TOGGLE_EDITOR = .E,
 	}
 	ctx.current_scene = .Menu
 	ctx.main_track = load_main_track()

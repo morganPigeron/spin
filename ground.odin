@@ -22,12 +22,13 @@ create_ground :: proc(world_id: b2.WorldId) -> (ground: Ground) {
 	ground_body := b2.DefaultBodyDef()
 	ground_body.position = {f32(rl.GetScreenWidth()) / 2, f32(rl.GetScreenHeight()) + UNIT / 2}
 	ground_body_id := b2.CreateBody(world_id, ground_body)
-	ground.extends = {f32(rl.GetScreenWidth() / 2), UNIT / 2}
+	ground.extends = {UNIT / 2, UNIT / 2}
 	ground_box := b2.MakeBox(ground.extends.x, ground.extends.y)
 	ground_shape := b2.DefaultShapeDef()
 	ground_shape_id := b2.CreatePolygonShape(ground_body_id, ground_shape, ground_box)
 	ground.body_id = ground_body_id
 	ground.shape_id = ground_shape_id
+	b2.Shape_SetUserData(ground_shape_id, &ShapeTypeGround)
 	return
 }
 

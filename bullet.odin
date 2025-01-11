@@ -38,6 +38,7 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.body_id = body_id
 	bullet.shape_id = shape_id
 	bullet.speed = common_bullet.speed * UNIT
+	b2.Shape_SetUserData(shape_id, &ShapeTypeBulletFromPlayer)
 	return
 }
 

@@ -129,6 +129,7 @@ create_enemy :: proc(world_id: b2.WorldId, pos: rl.Vector2) -> (enemy: Enemy) {
 	enemy.move_speed = 21395 * UNIT
 	enemy.move_max_velocity = 1.13 * UNIT
 	enemy.behavior = simple_behavior
+	b2.Shape_SetUserData(shape_id, &ShapeTypeEnemy)
 	return
 }
 

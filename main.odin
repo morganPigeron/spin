@@ -10,16 +10,6 @@ import b2 "vendor:box2d"
 import mu "vendor:microui"
 import rl "vendor:raylib"
 
-ShapeType :: enum {
-	PLAYER,
-	GROUND,
-	ENEMY,
-	BULLET_FROM_PLAYER,
-}
-
-UNIT :: 64 // 64 px => 1m
-INITIAL_SCREEN_WIDTH :: 1280
-INITIAL_SCREEN_HEIGHT :: 720
 main :: proc() {
 	context.logger = log.create_console_logger()
 
@@ -117,10 +107,12 @@ main :: proc() {
 		if rl.IsWindowResized() {
 			state.screen_width = rl.GetScreenWidth()
 			state.screen_height = rl.GetScreenHeight()
-			game_ctx.camera.zoom = min(
-				f32(state.screen_width) / INITIAL_SCREEN_WIDTH,
-				f32(state.screen_height) / INITIAL_SCREEN_HEIGHT,
-			)
+			if !game_ctx.is_editor {
+				game_ctx.camera.zoom = min(
+					f32(state.screen_width) / INITIAL_SCREEN_WIDTH,
+					f32(state.screen_height) / INITIAL_SCREEN_HEIGHT,
+				)
+			}
 		}
 
 		{ 	// micro ui
@@ -175,7 +167,7 @@ main :: proc() {
 		case .Menu:
 			update_menu_scene(&game_ctx)
 		}
-
+		update_editor(&game_ctx)
 
 		{ 	// update mico ui 
 			if rl.IsWindowResized() {
@@ -201,7 +193,7 @@ main :: proc() {
 			case .Menu:
 				render_menu_scene(&game_ctx)
 			}
-
+			render_editor(&game_ctx)
 			render(ctx)
 		}
 	}

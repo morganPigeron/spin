@@ -29,7 +29,9 @@ render_menu_scene :: proc(game_ctx: ^GameCtx) {
 		defer rl.EndMode2D()
 
 		render_wheel(game_ctx.wheel)
+	}
 
+	{
 		screen: rl.Vector2 = {f32(state.screen_width), f32(state.screen_height)}
 
 		button_size: rl.Vector2 = {200, 30}

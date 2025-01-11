@@ -7,3 +7,5 @@ MAIN_THEME :: "assets/MAIN THEME.mp3"
 GLASSES :: "assets/GJ1_glasses.png"
 CIG :: "assets/GJ1_cig.png"
 SUGAR :: "assets/GJ1_sugar.png"
+
+PLANT :: "assets/GJ1_plant1.png"

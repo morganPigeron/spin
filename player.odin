@@ -117,5 +117,6 @@ create_player :: proc(world_id: b2.WorldId) -> (player: Player) {
 	player.jump_speed = 130 * UNIT
 	player.move_speed = 31572 * UNIT
 	player.move_max_velocity = 3 * UNIT
+	b2.Shape_SetUserData(shape_id, &ShapeTypePlayer)
 	return
 }

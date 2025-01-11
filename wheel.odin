@@ -65,7 +65,7 @@ create_wheel :: proc() -> (wheel: Wheel) {
 	}
 	wheel.good_sound = rl.LoadSound(GOOD_SPIN)
 	wheel.bad_sound = rl.LoadSound(BAD_SPIN)
-	wheel.volume_sound = 1
+	wheel.volume_sound = DEFAULT_VOLUME
 	return
 }
 

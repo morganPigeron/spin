@@ -45,3 +45,20 @@ key_map := [mu.Key][2]rl.KeyboardKey {
 	.C         = {.C, .KEY_NULL},
 	.V         = {.V, .KEY_NULL},
 }
+
+ShapeType :: enum {
+	PLAYER,
+	GROUND,
+	ENEMY,
+	BULLET_FROM_PLAYER,
+}
+
+ShapeTypeGround := ShapeType.GROUND
+ShapeTypePlayer := ShapeType.PLAYER
+ShapeTypeEnemy := ShapeType.ENEMY
+ShapeTypeBulletFromPlayer := ShapeType.BULLET_FROM_PLAYER
+
+UNIT :: 64 // 64 px => 1m
+INITIAL_SCREEN_WIDTH :: 1280
+INITIAL_SCREEN_HEIGHT :: 720
+DEFAULT_VOLUME :: 0.1
