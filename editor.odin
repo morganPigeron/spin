@@ -53,14 +53,16 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			defer rl.EndMode2D()
 
 			// GRID
-			for i := top_left.x; i < bottom_right.x; i += UNIT {
-				start: rl.Vector2 = {f32(i), top_left.y}
-				end: rl.Vector2 = {f32(i), bottom_right.y}
+			a := nearest_grid_pos(top_left.xy, GRID_SPACING)
+			b := nearest_grid_pos(bottom_right.xy, GRID_SPACING)
+			for i := min(0, a.x); i < b.x; i += GRID_SPACING {
+				start: rl.Vector2 = {i, a.y}
+				end: rl.Vector2 = {i, b.y}
 				rl.DrawLineEx(start, end, 2, rl.GRAY)
 			}
-			for i := top_left.y; i < bottom_right.y; i += UNIT {
-				start: rl.Vector2 = {top_left.x, f32(i)}
-				end: rl.Vector2 = {bottom_right.x, f32(i)}
+			for i := min(0, a.y); i < b.y; i += GRID_SPACING {
+				start: rl.Vector2 = {a.x, i}
+				end: rl.Vector2 = {b.x, i}
 				rl.DrawLineEx(start, end, 2, rl.GRAY)
 			}
 
@@ -79,18 +81,15 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				rl.PURPLE,
 			)
 			rl.DrawLineEx({0, INITIAL_SCREEN_HEIGHT} + cam, {0, 0} + cam, 4, rl.PURPLE)
+
+			mouse := rl.GetScreenToWorld2D(rl.GetMousePosition(), game_ctx.camera)
+			if game_ctx.editor_mode == .PlaceGround {
+				pos: rl.Vector2 = nearest_grid_pos(mouse.xy, GRID_SPACING)
+				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
+			}
 		}
 
 		{ 	//screen space
-			mouse := rl.GetMousePosition()
-			if game_ctx.editor_mode == .PlaceGround {
-				pos: rl.Vector2 = {
-					math.round(mouse.x / UNIT) * UNIT,
-					math.round(mouse.y / UNIT) * UNIT,
-				}
-				rl.DrawRectangleV(pos, {UNIT, UNIT} * game_ctx.camera.zoom, rl.BROWN)
-			}
-
 			BUTTON_SIZE: rl.Vector2 : {150, 30}
 			if rl.GuiButton(
 				{screen.x - BUTTON_SIZE.x - 150, 150, BUTTON_SIZE.x, BUTTON_SIZE.y},
