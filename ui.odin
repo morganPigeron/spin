@@ -127,6 +127,11 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			mu.layout_row(ctx, {150, -1}, 0)
 			mu.label(ctx, "target: ")
 			mu.label(ctx, fmt.tprintf("x:%.2f y:%.2f", camera.target.x, camera.target.y))
+			mu.label(ctx, "screen size: ")
+			mu.label(
+				ctx,
+				fmt.tprintf("width:%v height:%v", state.screen_width, state.screen_height),
+			)
 			{ 	// friction slider
 				mu.label(ctx, "zoom: ")
 				mu.slider(ctx, &camera.zoom, 0.1, 10)

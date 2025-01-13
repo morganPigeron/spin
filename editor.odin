@@ -69,20 +69,30 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			}
 
 			// PLAYERVIEW
-			rl.DrawLineEx({0, 0} + cam, {INITIAL_SCREEN_WIDTH, 0} + cam, 4, rl.PURPLE)
 			rl.DrawLineEx(
-				{INITIAL_SCREEN_WIDTH, 0} + cam,
-				{INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT} + cam,
+				{-INITIAL_SCREEN_WIDTH / 2, -INITIAL_SCREEN_HEIGHT / 2} + cam,
+				{INITIAL_SCREEN_WIDTH / 2, -INITIAL_SCREEN_HEIGHT / 2} + cam,
 				4,
 				rl.PURPLE,
 			)
 			rl.DrawLineEx(
-				{INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT} + cam,
-				{0, INITIAL_SCREEN_HEIGHT} + cam,
+				{INITIAL_SCREEN_WIDTH / 2, -INITIAL_SCREEN_HEIGHT / 2} + cam,
+				{INITIAL_SCREEN_WIDTH / 2, INITIAL_SCREEN_HEIGHT / 2} + cam,
 				4,
 				rl.PURPLE,
 			)
-			rl.DrawLineEx({0, INITIAL_SCREEN_HEIGHT} + cam, {0, 0} + cam, 4, rl.PURPLE)
+			rl.DrawLineEx(
+				{INITIAL_SCREEN_WIDTH / 2, INITIAL_SCREEN_HEIGHT / 2} + cam,
+				{-INITIAL_SCREEN_WIDTH / 2, INITIAL_SCREEN_HEIGHT / 2} + cam,
+				4,
+				rl.PURPLE,
+			)
+			rl.DrawLineEx(
+				{-INITIAL_SCREEN_WIDTH / 2, INITIAL_SCREEN_HEIGHT / 2} + cam,
+				{-INITIAL_SCREEN_WIDTH / 2, -INITIAL_SCREEN_HEIGHT / 2} + cam,
+				4,
+				rl.PURPLE,
+			)
 
 			pos: rl.Vector2 = nearest_grid_pos(mouse.xy, grid_spacing)
 			switch game_ctx.editor_mode {
