@@ -16,10 +16,12 @@ Bullet :: struct {
 	shape_type: ShapeType,
 	speed:      f32,
 	direction:  rl.Vector2,
+	density:    f32,
 }
 
 common_bullet: Bullet = {
-	speed = 3000,
+	speed   = 144,
+	density = 0.1,
 }
 
 create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
@@ -33,7 +35,7 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	dynamic_box := b2.MakeBox(bullet.extends.x, bullet.extends.y)
 	shape_def := b2.DefaultShapeDef()
 	shape_def.enableHitEvents = true
-	shape_def.density = 1
+	shape_def.density = common_bullet.density
 	shape_id := b2.CreatePolygonShape(body_id, shape_def, dynamic_box)
 	bullet.body_id = body_id
 	bullet.shape_id = shape_id

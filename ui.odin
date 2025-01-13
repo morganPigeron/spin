@@ -165,15 +165,11 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.layout_row(ctx, {150, -1}, 0)
 				{ 	// speed slider 
 					mu.label(ctx, "speed: ")
-					mu.slider(ctx, &common_bullet.speed, 300, 10000)
+					mu.slider(ctx, &common_bullet.speed, 1, 500)
 				}
 				{ 	// density slider
 					mu.label(ctx, "density (kg) ")
-					value := b2.Shape_GetDensity(bullets[0].shape_id)
-					mu.slider(ctx, &value, 0, 1)
-					for &b in game_ctx.bullets {
-						b2.Shape_SetDensity(b.shape_id, value)
-					}
+					mu.slider(ctx, &common_bullet.density, 0.01, 1)
 				}
 			}
 

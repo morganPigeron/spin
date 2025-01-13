@@ -20,26 +20,35 @@ Player :: struct {
 	move_max_velocity:          f32,
 	is_on_ground:               bool,
 	last_time_still_vertically: f32,
-	last_time_jumped:           f32,
 	image:                      Image,
 	last_direction_facing:      rl.Vector2,
+	last_time_jumped:           f32,
+	last_time_shooting:         f32,
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
-	direction: rl.Vector2 = ctx.player.last_direction_facing
-	if rl.IsKeyDown(ctx.key_inputs[.RIGHT]) {
-		direction.x = 1
-	} else if rl.IsKeyDown(ctx.key_inputs[.LEFT]) {
-		direction.x = -1
-	}
 
-	if rl.IsKeyDown(ctx.key_inputs[.UP]) {
-		direction.y = -1
-	} else if rl.IsKeyDown(ctx.key_inputs[.DOWN]) {
-		direction.y = 1
-	}
+	ctx.player.last_time_shooting += rl.GetFrameTime()
+	DEBOUNCE :: 0.3
 
-	spawn_player_bullet(ctx, b2.Body_GetPosition(ctx.player.body_id), direction)
+	if ctx.player.last_time_shooting >= DEBOUNCE {
+		ctx.player.last_time_shooting = 0
+
+		direction: rl.Vector2 = ctx.player.last_direction_facing
+		if rl.IsKeyDown(ctx.key_inputs[.RIGHT]) {
+			direction.x = 1
+		} else if rl.IsKeyDown(ctx.key_inputs[.LEFT]) {
+			direction.x = -1
+		}
+
+		if rl.IsKeyDown(ctx.key_inputs[.UP]) {
+			direction.y = -1
+		} else if rl.IsKeyDown(ctx.key_inputs[.DOWN]) {
+			direction.y = 1
+		}
+
+		spawn_player_bullet(ctx, b2.Body_GetPosition(ctx.player.body_id), direction)
+	}
 }
 
 player_move_right :: proc(player: ^Player) {
