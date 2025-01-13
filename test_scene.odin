@@ -37,6 +37,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 	}
 
 	update_wheel(&game_ctx.wheel)
+	update_camera(game_ctx)
 }
 
 render_test_scene :: proc(game_ctx: ^GameCtx) {
