@@ -40,7 +40,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			{ 	// jump speed slider
 				mu.label(ctx, "jump impulse (N): ")
 				value := player.jump_speed / UNIT
-				mu.slider(ctx, &value, 100, 1000)
+				mu.slider(ctx, &value, 1, 1000)
 				player.jump_speed = value * UNIT
 			}
 			{ 	// friction slider

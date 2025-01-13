@@ -45,6 +45,8 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 		rl.BeginMode2D(game_ctx.camera)
 		defer rl.EndMode2D()
 
+		render_wheel(game_ctx.wheel)
+
 		for ground in game_ctx.grounds {
 			render_ground(ground)
 		}
@@ -54,7 +56,6 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 		for &enemy in game_ctx.enemies {
 			render_enemy(enemy)
 		}
-		render_wheel(game_ctx.wheel)
 		render_player(game_ctx.player)
 		for bullet in game_ctx.bullets {
 			render_bullet(bullet)
