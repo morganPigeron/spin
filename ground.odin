@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import "core:log"
+import "core:math"
 import "core:mem"
 import "core:strings"
 import "core:unicode/utf8"
@@ -15,6 +16,13 @@ Ground :: struct {
 	body_id:    b2.BodyId,
 	shape_id:   b2.ShapeId,
 	shape_type: ShapeType,
+}
+
+is_overlapping_ground :: proc(point: [2]f32, ground: Ground) -> bool {
+	pos := b2.Body_GetPosition(ground.body_id)
+	delta := point - pos
+	delta_abs: [2]f32 = {math.abs(delta.x), math.abs(delta.y)}
+	return delta_abs.x < ground.extends.x && delta_abs.y < ground.extends.y
 }
 
 delete_ground :: proc(ground: Ground) {
@@ -51,4 +59,11 @@ render_ground :: proc(ground: Ground) {
 		rl.BROWN,
 	)
 	rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
+	rl.DrawText(
+		fmt.ctprintf("id: %v", ground.body_id.index1),
+		i32(pos.x - ground.extends.x),
+		i32(pos.y),
+		20,
+		rl.BLACK,
+	)
 }

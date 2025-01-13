@@ -3,6 +3,7 @@ package main
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
+import "core:log"
 import "core:math"
 import "core:os"
 
@@ -100,6 +101,8 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				rl.DrawTextureV(game_ctx.assets[game_ctx.selected_asset], pos, rl.WHITE)
 			case .PlaceGround:
 				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
+			case .Remove:
+
 			case .None:
 			}
 		}
@@ -131,6 +134,11 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 					game_ctx.editor_mode = .PlaceImage
 					game_ctx.selected_asset = .CUBICLE
 					grid_spacing = 8
+				}
+
+				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "remove element") {
+					game_ctx.editor_mode = .Remove
 				}
 
 				button_rect.y += PADDING + button_rect.height
@@ -173,6 +181,39 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 							nearest_grid_pos(mouse.xy, grid_spacing) + UNIT / 2,
 						),
 					)
+				}
+			case .Remove:
+				if rl.IsMouseButtonPressed(.LEFT) {
+
+					{
+						i := 0
+						lenght := len(game_ctx.grounds)
+						for i < lenght {
+							if is_overlapping_ground(mouse.xy, game_ctx.grounds[i]) {
+								log.debugf("overlap %v", game_ctx.grounds[i].body_id)
+								delete_ground(game_ctx.grounds[i])
+								unordered_remove(&game_ctx.grounds, i)
+								lenght -= 1
+							} else {
+								i += 1
+							}
+						}
+					}
+
+					{
+						i := 0
+						lenght := len(game_ctx.images)
+						for i < lenght {
+							if is_overlapping_image(mouse.xy, game_ctx.images[i]) {
+								log.debugf("overlap %v", game_ctx.images[i].asset)
+								unordered_remove(&game_ctx.images, i)
+								lenght -= 1
+							} else {
+								i += 1
+							}
+						}
+					}
+
 				}
 			case .None:
 			}

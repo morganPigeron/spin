@@ -25,6 +25,7 @@ EditorMode :: enum {
 	None,
 	PlaceGround,
 	PlaceImage,
+	Remove,
 }
 
 GameCtx :: struct {
