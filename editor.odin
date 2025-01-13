@@ -34,7 +34,7 @@ update_editor :: proc(game_ctx: ^GameCtx) {
 
 		scroll := rl.GetMouseWheelMove()
 		if scroll != 0 {
-			game_ctx.camera.zoom += scroll * rl.GetFrameTime()
+			game_ctx.camera.zoom += scroll * rl.GetFrameTime() * 10
 		}
 
 	} else {

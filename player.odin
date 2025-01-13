@@ -27,10 +27,7 @@ Player :: struct {
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
-
-	ctx.player.last_time_shooting += rl.GetFrameTime()
 	DEBOUNCE :: 0.3
-
 	if ctx.player.last_time_shooting >= DEBOUNCE {
 		ctx.player.last_time_shooting = 0
 
@@ -68,7 +65,6 @@ player_move_left :: proc(player: ^Player) {
 }
 
 player_jump :: proc(player: ^Player) {
-	player.last_time_jumped += rl.GetFrameTime()
 	DEBOUNCE :: 0.2
 	if player.is_on_ground && player.last_time_jumped > DEBOUNCE {
 		b2.Body_ApplyLinearImpulseToCenter(player.body_id, {0, -UNIT * player.jump_speed}, true)
@@ -78,9 +74,38 @@ player_jump :: proc(player: ^Player) {
 
 update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 
-	player_velocity := b2.Body_GetLinearVelocity(player.body_id)
-	NEAR_ZERO :: 0.01
-	is_still_vertically := math.abs(player_velocity.y) <= NEAR_ZERO
+	//update all timer : 
+	player.last_time_shooting += rl.GetFrameTime()
+	player.last_time_jumped += rl.GetFrameTime()
+
+	//DEBUG TODO remove that
+	@(static) min_vel: f32 = 341232343
+	@(static) max_vel: f32 = -1
+
+	player_velocity := math.abs(b2.Body_GetLinearVelocity(player.body_id).y)
+	jump_tolerance :: 0.01
+	is_still_vertically := player_velocity <= jump_tolerance
+
+	//DEBUG TODO remove that
+	@(static) debug_toggle := false
+	if rl.IsKeyPressed(.F) {
+		debug_toggle = true
+	}
+	if debug_toggle {
+		if player_velocity > max_vel {
+			max_vel = player_velocity
+
+		} else if player_velocity < min_vel {
+			min_vel = player_velocity
+		}
+		log.debugf("min %v, max %v", min_vel, max_vel)
+	}
+
+	if is_still_vertically {
+		player.last_time_still_vertically += rl.GetFrameTime()
+	} else {
+		player.last_time_still_vertically = 0
+	}
 
 	for begin in contact_events.beginEvents[:contact_events.beginCount] {
 		a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
@@ -102,12 +127,6 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 		} else if a^ == .PLAYER && b^ == .GROUND {
 			player.is_on_ground = false
 		}
-	}
-
-	if is_still_vertically {
-		player.last_time_still_vertically += rl.GetFrameTime()
-	} else {
-		player.last_time_still_vertically = 0
 	}
 
 	TIME_TO_RESET_JUMP :: 0.2
