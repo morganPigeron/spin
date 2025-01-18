@@ -12,7 +12,11 @@ SUGAR :: "assets/GJ1_sugar.png"
 
 PLANT :: "assets/GJ1_plant1_OL.png"
 CUBICLE :: "assets/GJ1_cubicle.png"
+PRINTER :: "assets/GJ1_printer.png"
 CHARACTER :: "assets/mainchara.png"
+BOY1 :: "assets/GJ1_char1.png"
+GIRL1 :: "assets/GJ1_char2.png"
+GIRL2 :: "assets/GJ1_char3.png"
 
 Assets :: enum {
 	GLASSES,
@@ -21,4 +25,8 @@ Assets :: enum {
 	PLANT,
 	CUBICLE,
 	CHARACTER,
+	PRINTER,
+	BOY1,
+	GIRL1,
+	GIRL2,
 }

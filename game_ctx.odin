@@ -78,6 +78,10 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.SUGAR     = rl.LoadTexture(SUGAR),
 		.CUBICLE   = rl.LoadTexture(CUBICLE),
 		.CHARACTER = rl.LoadTexture(CHARACTER),
+		.PRINTER   = rl.LoadTexture(PRINTER),
+		.BOY1      = rl.LoadTexture(BOY1),
+		.GIRL1     = rl.LoadTexture(GIRL1),
+		.GIRL2     = rl.LoadTexture(GIRL2),
 	}
 	return
 }

@@ -160,7 +160,6 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
 		center2 = {0, player.extends.y},
 		radius  = player.extends.x,
 	}
-	//b2.MakeBox(player.extends.x, player.extends.y)
 	shape_def := b2.DefaultShapeDef()
 	shape_def.density = 1
 	shape_def.friction = 0.07
