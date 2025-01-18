@@ -38,6 +38,7 @@ update_editor :: proc(game_ctx: ^GameCtx) {
 			game_ctx.camera.zoom += scroll * rl.GetFrameTime() * 10
 		}
 
+		update_sprite(&game_ctx.editor_selected_sprite)
 	} else {
 
 	}
@@ -99,6 +100,8 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			switch game_ctx.editor_mode {
 			case .PlaceImage:
 				rl.DrawTextureV(game_ctx.assets[game_ctx.selected_asset], pos, rl.WHITE)
+			case .PlaceSprite:
+				render_sprite(&game_ctx.editor_selected_sprite, pos)
 			case .PlaceGround:
 				rl.DrawRectangleV(pos, {UNIT, UNIT}, rl.BROWN)
 			case .Remove:
@@ -137,13 +140,20 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				}
 
 				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "place printer") {
+					game_ctx.editor_mode = .PlaceSprite
+					grid_spacing = 8
+					game_ctx.editor_selected_sprite = create_sprite(game_ctx^, {0, 0}, .PRINTER)
+				}
+
+				button_rect.y += PADDING + button_rect.height
 				if rl.GuiButton(button_rect, "remove element") {
 					game_ctx.editor_mode = .Remove
 				}
 
 				button_rect.y += PADDING + button_rect.height
 				if rl.GuiButton(button_rect, "save") {
-					save := serialize_ctx_v1(game_ctx)
+					save := serialize_ctx_v2(game_ctx)
 					defer delete(save)
 					os.write_entire_file("save.spin", save)
 				}
@@ -169,6 +179,17 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 							game_ctx^,
 							nearest_grid_pos(mouse.xy, grid_spacing),
 							game_ctx.selected_asset,
+						),
+					)
+				}
+			case .PlaceSprite:
+				if rl.IsMouseButtonPressed(.LEFT) {
+					append(
+						&game_ctx.sprites,
+						create_sprite(
+							game_ctx^,
+							nearest_grid_pos(mouse.xy, grid_spacing),
+							.PRINTER,
 						),
 					)
 				}

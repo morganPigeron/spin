@@ -25,25 +25,28 @@ EditorMode :: enum {
 	None,
 	PlaceGround,
 	PlaceImage,
+	PlaceSprite,
 	Remove,
 }
 
 GameCtx :: struct {
-	current_scene:  Scenes,
-	world_id:       b2.WorldId,
-	camera:         rl.Camera2D,
-	player:         Player,
-	wheel:          Wheel,
-	grounds:        [dynamic]Ground,
-	images:         [dynamic]Image,
-	enemies:        [dynamic]Enemy,
-	bullets:        [dynamic]Bullet,
-	key_inputs:     [InputList]rl.KeyboardKey,
-	main_track:     Track,
-	is_editor:      bool,
-	editor_mode:    EditorMode,
-	assets:         map[Assets]rl.Texture2D,
-	selected_asset: Assets,
+	current_scene:          Scenes,
+	world_id:               b2.WorldId,
+	camera:                 rl.Camera2D,
+	player:                 Player,
+	wheel:                  Wheel,
+	grounds:                [dynamic]Ground,
+	images:                 [dynamic]Image,
+	sprites:                [dynamic]Sprite,
+	enemies:                [dynamic]Enemy,
+	bullets:                [dynamic]Bullet,
+	key_inputs:             [InputList]rl.KeyboardKey,
+	main_track:             Track,
+	is_editor:              bool,
+	editor_mode:            EditorMode,
+	editor_selected_sprite: Sprite,
+	assets:                 map[Assets]rl.Texture2D,
+	selected_asset:         Assets,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
@@ -57,6 +60,7 @@ spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.
 new_game_ctx :: proc() -> (ctx: GameCtx) {
 	ctx.enemies = make([dynamic]Enemy, 0, 100)
 	ctx.bullets = make([dynamic]Bullet, 0, 100)
+	ctx.sprites = make([dynamic]Sprite, 0, 100)
 	ctx.grounds = make([dynamic]Ground, 0, 100)
 	ctx.images = make([dynamic]Image, 0, 100)
 	ctx.key_inputs = {
@@ -97,6 +101,7 @@ delete_game_ctx :: proc(ctx: GameCtx) {
 	delete(ctx.bullets)
 	delete(ctx.grounds)
 	delete(ctx.assets)
+	delete(ctx.sprites)
 	delete(ctx.images)
 	delete_wheel(ctx.wheel)
 }
@@ -112,6 +117,7 @@ change_scene :: proc(ctx: ^GameCtx, new_scene: Scenes) {
 
 SerializeVersion :: enum {
 	V1,
+	V2, // sprites added as background
 }
 
 eat_next :: proc(buffer: []u8, cursor: ^int, $T: typeid) -> T {
@@ -153,8 +159,31 @@ deserialize_ctx :: proc(ctx: ^GameCtx, buffer: []u8) {
 			asset := eat_next(buffer, &cursor, Assets)
 			append(&ctx.images, create_image(ctx^, pos, asset))
 		}
-	}
 
+	case .V2:
+		ground_count := eat_next(buffer, &cursor, int)
+		for i := 0; i < ground_count; i += 1 {
+			pos := eat_next(buffer, &cursor, b2.Vec2)
+			extend := eat_next(buffer, &cursor, b2.Vec2) // TODO no need for now 
+			shape_type := eat_next(buffer, &cursor, ShapeType) // TODO no need for now 
+			append(&ctx.grounds, create_ground(ctx.world_id, pos))
+		}
+
+		image_count := eat_next(buffer, &cursor, int)
+		for i := 0; i < image_count; i += 1 {
+			pos := eat_next(buffer, &cursor, rl.Vector2)
+			asset := eat_next(buffer, &cursor, Assets)
+			append(&ctx.images, create_image(ctx^, pos, asset))
+		}
+
+		sprite_count := eat_next(buffer, &cursor, int)
+		for i := 0; i < sprite_count; i += 1 {
+			pos := eat_next(buffer, &cursor, rl.Vector2)
+			asset := eat_next(buffer, &cursor, Assets)
+			rect := eat_next(buffer, &cursor, rl.Rectangle)
+			append(&ctx.sprites, create_sprite(ctx^, pos, asset))
+		}
+	}
 }
 
 serialize_ctx_v1 :: proc(ctx: ^GameCtx) -> []u8 {
@@ -173,6 +202,34 @@ serialize_ctx_v1 :: proc(ctx: ^GameCtx) -> []u8 {
 	for image in ctx.images {
 		serialize_type(&result, image.pos)
 		serialize_type(&result, image.asset)
+	}
+
+	return result[:]
+}
+
+serialize_ctx_v2 :: proc(ctx: ^GameCtx) -> []u8 {
+	result: [dynamic]u8
+
+	serialize_type(&result, SerializeVersion.V2)
+
+	serialize_type(&result, len(ctx.grounds))
+	for ground in ctx.grounds {
+		serialize_type(&result, b2.Body_GetPosition(ground.body_id))
+		serialize_type(&result, ground.extends)
+		serialize_type(&result, ground.shape_type)
+	}
+
+	serialize_type(&result, len(ctx.images))
+	for image in ctx.images {
+		serialize_type(&result, image.pos)
+		serialize_type(&result, image.asset)
+	}
+
+	serialize_type(&result, len(ctx.sprites))
+	for sprite in ctx.sprites {
+		serialize_type(&result, sprite.position)
+		serialize_type(&result, sprite.asset)
+		serialize_type(&result, sprite.rect)
 	}
 
 	return result[:]

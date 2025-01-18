@@ -3,7 +3,9 @@ package main
 import rl "vendor:raylib"
 
 Sprite :: struct {
+	position:     rl.Vector2,
 	texture:      rl.Texture,
+	asset:        Assets,
 	rect:         rl.Rectangle,
 	frame_count:  int,
 	frame_cursor: int,
@@ -13,8 +15,19 @@ Sprite :: struct {
 	ping_pong:    bool,
 }
 
+create_sprite :: proc(ctx: GameCtx, pos: rl.Vector2, asset: Assets) -> Sprite {
+	#partial switch asset {
+	case .PRINTER:
+		result := new_printer(ctx)
+		result.position = pos
+		return result
+	}
+	return new_printer(ctx)
+}
+
 new_cig :: proc(ctx: GameCtx) -> (result: Sprite) {
 	result.texture = ctx.assets[.CIG]
+	result.asset = .CIG
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 11
 	result.frame_cursor = 0
@@ -26,6 +39,7 @@ new_cig :: proc(ctx: GameCtx) -> (result: Sprite) {
 
 new_glass :: proc(ctx: GameCtx) -> (result: Sprite) {
 	result.texture = ctx.assets[.GLASSES]
+	result.asset = .GLASSES
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 10
 	result.frame_cursor = 0
@@ -38,6 +52,7 @@ new_glass :: proc(ctx: GameCtx) -> (result: Sprite) {
 
 new_sugar :: proc(ctx: GameCtx) -> (result: Sprite) {
 	result.texture = ctx.assets[.SUGAR]
+	result.asset = .SUGAR
 	result.rect = rl.Rectangle{0, 0, 32, 32}
 	result.frame_count = 9
 	result.frame_cursor = 0
@@ -45,6 +60,19 @@ new_sugar :: proc(ctx: GameCtx) -> (result: Sprite) {
 	result.frame_time = 0.12
 	result.increment = 1
 	result.ping_pong = true
+	return
+}
+
+new_printer :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.PRINTER]
+	result.asset = .PRINTER
+	result.rect = rl.Rectangle{0, 0, 48, 48}
+	result.frame_count = 16
+	result.frame_cursor = 0
+	result.current_time = 0.0
+	result.frame_time = 0.12
+	result.increment = 1
+	result.ping_pong = false
 	return
 }
 
@@ -74,6 +102,7 @@ update_sprite :: proc(s: ^Sprite) {
 	}
 }
 
-render_sprite :: proc(s: Sprite, pos: rl.Vector2) {
-	rl.DrawTextureRec(s.texture, s.rect, pos, rl.WHITE)
+render_sprite :: proc(s: ^Sprite, pos: rl.Vector2) {
+	s.position = pos
+	rl.DrawTextureRec(s.texture, s.rect, s.position, rl.WHITE)
 }

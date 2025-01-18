@@ -113,7 +113,7 @@ render_wheel :: proc(wheel: Wheel) {
 	rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)
 
 	angle: f32 = 360 / f32(len(wheel.elements))
-	for element, i in wheel.elements {
+	for &element, i in wheel.elements {
 		angle_start: f32 = (angle * f32(i)) + wheel.angle
 		angle_sprite: f32 = (angle * f32(i) + (angle / 2)) + wheel.angle
 		angle_end: f32 = (angle * f32(i + 1)) + wheel.angle
@@ -134,9 +134,8 @@ render_wheel :: proc(wheel: Wheel) {
 			{x_end, y_end} + wheel.position,
 			element.color,
 		)
-
 		render_sprite(
-			element.sprite,
+			&element.sprite,
 			{x_sprite, y_sprite} +
 			(wheel.position - {element.sprite.rect.width / 2, element.sprite.rect.height / 2}),
 		)

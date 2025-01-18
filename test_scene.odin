@@ -22,6 +22,10 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 		enemy.behavior(&enemy, game_ctx^)
 	}
 
+	for &sprite in game_ctx.sprites {
+		update_sprite(&sprite)
+	}
+
 	{ 	//update
 		if rl.IsKeyDown(game_ctx.key_inputs[.RIGHT]) {
 			player_move_right(&game_ctx.player)
@@ -53,6 +57,9 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 		}
 		for image in game_ctx.images {
 			render_image(image)
+		}
+		for &sprite in game_ctx.sprites {
+			render_sprite(&sprite, sprite.position.xy)
 		}
 		for &enemy in game_ctx.enemies {
 			render_enemy(enemy)
