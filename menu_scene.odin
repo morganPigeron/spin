@@ -8,18 +8,18 @@ import "core:log"
 setup_menu_scene :: proc(game_ctx: ^GameCtx) {
 	game_ctx.wheel.position = {f32(state.screen_width / 2), f32(state.screen_height / 2)}
 
-	if !rl.IsMusicValid(game_ctx.main_track.music) {
+	if !rl.IsSoundValid(game_ctx.musics[.MAIN_THEME_2]) {
 		log.error("music is not valid")
 	}
-	if !rl.IsMusicStreamPlaying(game_ctx.main_track.music) {
-		rl.PlayMusicStream(game_ctx.main_track.music)
+	if !rl.IsSoundPlaying(game_ctx.musics[.MAIN_THEME_2]) {
+		rl.PlaySound(game_ctx.musics[.MAIN_THEME_2])
 	}
 
 	start_wheel(&game_ctx.wheel)
 }
 
 update_menu_scene :: proc(game_ctx: ^GameCtx) {
-	rl.UpdateMusicStream(game_ctx.main_track.music)
+	//rl.UpdateSound(game_ctx.musics[.MAIN_THEME_2])
 	update_wheel(&game_ctx.wheel)
 	update_clock(&game_ctx.game_clock)
 }

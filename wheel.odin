@@ -64,8 +64,8 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 			WheelElement{color = rl.Color{u8(i * 40), 125, u8(i * 20), 255}, sprite = sprite},
 		)
 	}
-	wheel.good_sound = rl.LoadSound(GOOD_SPIN)
-	wheel.bad_sound = rl.LoadSound(BAD_SPIN)
+	wheel.good_sound = ctx.musics[.GOOD_SPIN_2]
+	wheel.bad_sound = ctx.musics[.BAD_SPIN_2]
 	wheel.volume_sound = DEFAULT_VOLUME
 	return
 }

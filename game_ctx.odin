@@ -2,6 +2,7 @@
 
 package main
 
+import "core:log"
 import "core:slice"
 import "core:time"
 import b2 "vendor:box2d"
@@ -43,11 +44,11 @@ GameCtx :: struct {
 	enemies:                [dynamic]Enemy,
 	bullets:                [dynamic]Bullet,
 	key_inputs:             [InputList]rl.KeyboardKey,
-	main_track:             Track,
 	is_editor:              bool,
 	editor_mode:            EditorMode,
 	editor_selected_sprite: Sprite,
 	assets:                 map[Assets]rl.Texture2D,
+	musics:                 map[Sounds]rl.Sound,
 	selected_asset:         Assets,
 	game_clock:             GameClock,
 }
@@ -76,7 +77,6 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.TOGGLE_EDITOR = .E,
 	}
 	ctx.current_scene = .Menu
-	ctx.main_track = load_main_track()
 
 	ctx.assets = {
 		.PLANT     = rl.LoadTexture(PLANT),
@@ -89,6 +89,24 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.BOY1      = rl.LoadTexture(BOY1),
 		.GIRL1     = rl.LoadTexture(GIRL1),
 		.GIRL2     = rl.LoadTexture(GIRL2),
+	}
+
+	ctx.musics = {
+		.BAD_SPIN     = rl.LoadSoundFromWave(SoundsList[.BAD_SPIN]),
+		.BAD_SPIN_2   = rl.LoadSoundFromWave(SoundsList[.BAD_SPIN_2]),
+		.GOOD_SPIN    = rl.LoadSoundFromWave(SoundsList[.GOOD_SPIN]),
+		.GOOD_SPIN_2  = rl.LoadSoundFromWave(SoundsList[.GOOD_SPIN_2]),
+		.MAIN_THEME   = rl.LoadSoundFromWave(SoundsList[.MAIN_THEME]),
+		.MAIN_THEME_2 = rl.LoadSoundFromWave(SoundsList[.MAIN_THEME_2]),
+		.ATTACK_FX_1  = rl.LoadSoundFromWave(SoundsList[.ATTACK_FX_1]),
+		.ATTACK_FX_2  = rl.LoadSoundFromWave(SoundsList[.ATTACK_FX_2]),
+		.ATTACK_FX_3  = rl.LoadSoundFromWave(SoundsList[.ATTACK_FX_3]),
+		.JUMP_FX_1    = rl.LoadSoundFromWave(SoundsList[.JUMP_FX_1]),
+		.JUMP_FX_2    = rl.LoadSoundFromWave(SoundsList[.JUMP_FX_2]),
+		.JUMP_FX_3    = rl.LoadSoundFromWave(SoundsList[.JUMP_FX_3]),
+		.WALKING_FX_1 = rl.LoadSoundFromWave(SoundsList[.WALKING_FX_1]),
+		.WALKING_FX_2 = rl.LoadSoundFromWave(SoundsList[.WALKING_FX_2]),
+		.WALKING_FX_3 = rl.LoadSoundFromWave(SoundsList[.WALKING_FX_3]),
 	}
 
 	ctx.game_clock = new_game_clock()

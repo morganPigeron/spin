@@ -39,6 +39,10 @@ main :: proc() {
 	rl.SetTargetFPS(60)
 
 	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+	if !rl.IsAudioDeviceReady() {
+		log.error("audio device not ready")
+	}
 
 	// connect clipboard with microui
 	ctx := &state.mu_ctx

@@ -161,7 +161,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				mu.label(ctx, "main theme volume: ")
 				@(static) value: f32 = 1
 				mu.slider(ctx, &value, 0, 1)
-				rl.SetMusicVolume(game_ctx.main_track.music, value)
+				rl.SetSoundVolume(game_ctx.musics[.MAIN_THEME_2], value)
 			}
 		}
 		if .ACTIVE in mu.header(ctx, "bullets") {
