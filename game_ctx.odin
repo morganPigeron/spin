@@ -3,8 +3,10 @@
 package main
 
 import "core:slice"
+import "core:time"
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
+
 
 InputList :: enum {
 	UP,
@@ -47,6 +49,7 @@ GameCtx :: struct {
 	editor_selected_sprite: Sprite,
 	assets:                 map[Assets]rl.Texture2D,
 	selected_asset:         Assets,
+	game_clock:             GameClock,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
@@ -87,6 +90,8 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.GIRL1     = rl.LoadTexture(GIRL1),
 		.GIRL2     = rl.LoadTexture(GIRL2),
 	}
+
+	ctx.game_clock = new_game_clock()
 	return
 }
 

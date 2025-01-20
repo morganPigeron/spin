@@ -5,6 +5,7 @@ import "core:log"
 import "core:math"
 import "core:mem"
 import "core:strings"
+import "core:time"
 import "core:unicode/utf8"
 
 import b2 "vendor:box2d"
@@ -109,7 +110,7 @@ start_wheel :: proc(wheel: ^Wheel) {
 	}
 }
 
-render_wheel :: proc(wheel: Wheel) {
+render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
 	rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)
 
 	angle: f32 = 360 / f32(len(wheel.elements))
@@ -140,4 +141,44 @@ render_wheel :: proc(wheel: Wheel) {
 			(wheel.position - {element.sprite.rect.width / 2, element.sprite.rect.height / 2}),
 		)
 	}
+
+	// draw clock
+	clock := ctx.game_clock
+	h, m, s := time.clock_from_time(clock.current_time)
+
+	{ 	// numeric clock
+		rl.DrawRectangle(
+			i32(wheel.position.x - 29 - 5),
+			i32(wheel.position.y + 20),
+			78,
+			20,
+			rl.DARKGRAY,
+		)
+		rl.DrawText(
+			fmt.ctprintf("%v:%v:%2d", h, m, s),
+			i32(wheel.position.x - 29),
+			i32(wheel.position.y + 20),
+			20,
+			{255, 191, 0, 255},
+		)
+	}
+
+	{ 	// sec
+		angle: f32 = (f32(s) * 360 / 60) - 90
+		end := polar_to_cartesian(wheel.radius, f32(rl.DEG2RAD) * angle)
+		rl.DrawLineEx(wheel.position, end + wheel.position, 1, rl.BLACK)
+	}
+
+	{ 	// min
+		angle: f32 = (f32(m) * 360 / 60) - 90
+		end := polar_to_cartesian(wheel.radius / 4 * 3, f32(rl.DEG2RAD) * angle)
+		rl.DrawLineEx(wheel.position, end + wheel.position, 2, rl.BLACK)
+	}
+
+	{ 	// hour
+		angle: f32 = (f32(h) * 360 / 12) - 90
+		end := polar_to_cartesian(wheel.radius / 2, f32(rl.DEG2RAD) * angle)
+		rl.DrawLineEx(wheel.position, end + wheel.position, 3, rl.BLACK)
+	}
+
 }

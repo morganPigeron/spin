@@ -21,6 +21,7 @@ setup_menu_scene :: proc(game_ctx: ^GameCtx) {
 update_menu_scene :: proc(game_ctx: ^GameCtx) {
 	rl.UpdateMusicStream(game_ctx.main_track.music)
 	update_wheel(&game_ctx.wheel)
+	update_clock(&game_ctx.game_clock)
 }
 
 render_menu_scene :: proc(game_ctx: ^GameCtx) {
@@ -28,7 +29,7 @@ render_menu_scene :: proc(game_ctx: ^GameCtx) {
 		rl.BeginMode2D(game_ctx.camera)
 		defer rl.EndMode2D()
 
-		render_wheel(game_ctx.wheel)
+		render_wheel(game_ctx^, game_ctx.wheel)
 	}
 
 	{
