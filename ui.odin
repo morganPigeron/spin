@@ -109,8 +109,8 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			{ 	// sound volume slider
 				mu.label(ctx, "volume: ")
 				mu.slider(ctx, &wheel.volume_sound, 0, 1)
-				rl.SetSoundVolume(wheel.bad_sound, wheel.volume_sound)
-				rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
+				rl.SetMusicVolume(wheel.bad_sound, wheel.volume_sound)
+				rl.SetMusicVolume(wheel.good_sound, wheel.volume_sound)
 			}
 			{ 	// friction slider
 				mu.label(ctx, "friction coef: ")
@@ -154,14 +154,14 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			{ 	// wheel sound volume slider
 				mu.label(ctx, "wheel volume: ")
 				mu.slider(ctx, &wheel.volume_sound, 0, 1)
-				rl.SetSoundVolume(wheel.bad_sound, wheel.volume_sound)
-				rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
+				rl.SetMusicVolume(wheel.bad_sound, wheel.volume_sound)
+				rl.SetMusicVolume(wheel.good_sound, wheel.volume_sound)
 			}
 			{ 	// main sound volume slider
 				mu.label(ctx, "main theme volume: ")
 				@(static) value: f32 = 1
 				mu.slider(ctx, &value, 0, 1)
-				rl.SetSoundVolume(game_ctx.musics[.MAIN_THEME_2], value)
+				rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], value)
 			}
 		}
 		if .ACTIVE in mu.header(ctx, "bullets") {

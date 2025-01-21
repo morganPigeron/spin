@@ -28,8 +28,8 @@ Wheel :: struct {
 	is_turning:         bool,
 	need_to_play_sound: bool,
 	is_sound_playing:   bool,
-	good_sound:         rl.Sound,
-	bad_sound:          rl.Sound,
+	good_sound:         rl.Music,
+	bad_sound:          rl.Music,
 	volume_sound:       f32,
 }
 
@@ -84,8 +84,8 @@ update_wheel :: proc(wheel: ^Wheel) {
 
 	if wheel.need_to_play_sound {
 		wheel.need_to_play_sound = false
-		rl.SetSoundVolume(wheel.good_sound, wheel.volume_sound)
-		rl.PlaySound(wheel.good_sound)
+		rl.SetMusicVolume(wheel.good_sound, wheel.volume_sound)
+		rl.PlayMusicStream(wheel.good_sound)
 	}
 
 	if wheel.is_turning {
@@ -96,7 +96,7 @@ update_wheel :: proc(wheel: ^Wheel) {
 		}
 	}
 
-	wheel.is_sound_playing = rl.IsSoundPlaying(wheel.good_sound)
+	wheel.is_sound_playing = rl.IsMusicStreamPlaying(wheel.good_sound)
 
 	for &e in wheel.elements {
 		update_sprite(&e.sprite)
