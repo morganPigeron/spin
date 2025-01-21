@@ -235,6 +235,19 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 						}
 					}
 
+					{
+						i := 0
+						lenght := len(game_ctx.sprites)
+						for i < lenght {
+							if is_overlapping_sprite(mouse.xy, game_ctx.sprites[i]) {
+								unordered_remove(&game_ctx.sprites, i)
+								lenght -= 1
+							} else {
+								i += 1
+							}
+						}
+					}
+
 				}
 			case .None:
 			}

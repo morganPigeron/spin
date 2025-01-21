@@ -86,21 +86,6 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 	jump_tolerance :: 0.01
 	is_still_vertically := player_velocity <= jump_tolerance
 
-	//DEBUG TODO remove that
-	@(static) debug_toggle := false
-	if rl.IsKeyPressed(.F) {
-		debug_toggle = true
-	}
-	if debug_toggle {
-		if player_velocity > max_vel {
-			max_vel = player_velocity
-
-		} else if player_velocity < min_vel {
-			min_vel = player_velocity
-		}
-		log.debugf("min %v, max %v", min_vel, max_vel)
-	}
-
 	if is_still_vertically {
 		player.last_time_still_vertically += rl.GetFrameTime()
 	} else {

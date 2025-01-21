@@ -106,3 +106,15 @@ render_sprite :: proc(s: ^Sprite, pos: rl.Vector2) {
 	s.position = pos
 	rl.DrawTextureRec(s.texture, s.rect, s.position, rl.WHITE)
 }
+
+is_overlapping_sprite :: proc(point: [2]f32, sprite: Sprite) -> bool {
+	return rl.CheckCollisionPointRec(
+		point.xy,
+		{
+			sprite.position.x,
+			sprite.position.y,
+			f32(sprite.texture.width),
+			f32(sprite.texture.height),
+		},
+	)
+}

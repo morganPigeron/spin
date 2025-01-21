@@ -90,7 +90,12 @@ update_enemy :: proc(ctx: GameCtx, enemy: ^Enemy, contact_events: b2.ContactEven
 			for bullet in ctx.bullets {
 				if rl.CheckCollisionPointRec(
 					b2.Body_GetPosition(bullet.body_id).xy,
-					{pos.x, pos.y, enemy.extends.x * 2, enemy.extends.y * 2},
+					{
+						pos.x - enemy.extends.x,
+						pos.y - enemy.extends.y,
+						enemy.extends.x * 2,
+						enemy.extends.y * 2,
+					},
 				) {
 					enemy.hp -= 10
 				}
