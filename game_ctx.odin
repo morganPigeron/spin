@@ -126,6 +126,7 @@ delete_game_ctx :: proc(ctx: GameCtx) {
     delete(ctx.assets)
     delete(ctx.sprites)
     delete(ctx.images)
+    delete(ctx.musics)
     delete_wheel(ctx.wheel)
 }
 

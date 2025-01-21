@@ -39,6 +39,9 @@ DATA_WALKING_FX_2 := #load("assets/WALKING FX 2.wav")
 DATA_WALKING_FX_3 := #load("assets/WALKING FX 3.wav")
 
 SoundsList: map[Sounds]rl.Music
+delete_sounds :: proc () {
+    delete(SoundsList)
+}
 load_sounds :: proc () {
     SoundsList = {
 	    .BAD_SPIN     = rl.LoadMusicStreamFromMemory(

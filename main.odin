@@ -44,6 +44,7 @@ main :: proc() {
 	log.error("audio device not ready")
     }
     load_sounds()
+    defer delete_sounds()
     
     // connect clipboard with microui
     ctx := &state.mu_ctx
