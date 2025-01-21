@@ -147,6 +147,13 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				}
 
 				button_rect.y += PADDING + button_rect.height
+				if rl.GuiButton(button_rect, "place stappler") {
+					game_ctx.editor_mode = .PlaceSprite
+					grid_spacing = 8
+					game_ctx.editor_selected_sprite = create_sprite(game_ctx^, {0, 0}, .STAPPLER)
+				}
+
+				button_rect.y += PADDING + button_rect.height
 				if rl.GuiButton(button_rect, "remove element") {
 					game_ctx.editor_mode = .Remove
 				}
@@ -184,14 +191,7 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 				}
 			case .PlaceSprite:
 				if rl.IsMouseButtonPressed(.LEFT) {
-					append(
-						&game_ctx.sprites,
-						create_sprite(
-							game_ctx^,
-							nearest_grid_pos(mouse.xy, grid_spacing),
-							.PRINTER,
-						),
-					)
+					append(&game_ctx.sprites, game_ctx.editor_selected_sprite)
 				}
 			case .PlaceGround:
 				if rl.IsMouseButtonPressed(.LEFT) {

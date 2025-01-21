@@ -60,6 +60,9 @@ update_bullet :: proc(bullet: ^Bullet) {
 
 render_bullet :: proc(bullet: ^Bullet) {
 	pos := b2.Body_GetPosition(bullet.body_id)
-	render_sprite(&bullet.sprite, pos)
+	render_sprite(
+		&bullet.sprite,
+		pos - {bullet.sprite.rect.width / 2, bullet.sprite.rect.height / 2},
+	)
 	//rl.DrawCircleV(pos.xy, bullet.extends.x, rl.PURPLE)
 }

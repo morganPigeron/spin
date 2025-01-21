@@ -21,7 +21,12 @@ create_sprite :: proc(ctx: GameCtx, pos: rl.Vector2, asset: Assets) -> Sprite {
 		result := new_printer(ctx)
 		result.position = pos
 		return result
+	case .STAPPLER:
+		result := new_stappler(ctx)
+		result.position = pos
+		return result
 	}
+
 	return new_printer(ctx)
 }
 
