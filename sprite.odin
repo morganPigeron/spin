@@ -76,6 +76,19 @@ new_printer :: proc(ctx: GameCtx) -> (result: Sprite) {
 	return
 }
 
+new_stappler :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.STAPPLER]
+	result.asset = .STAPPLER
+	result.rect = rl.Rectangle{0, 0, 32, 32}
+	result.frame_count = 8
+	result.frame_cursor = 0
+	result.current_time = 0.0
+	result.frame_time = 0.12
+	result.increment = 1
+	result.ping_pong = false
+	return
+}
+
 update_sprite :: proc(s: ^Sprite) {
 	s.current_time += rl.GetFrameTime()
 	if s.current_time > s.frame_time {

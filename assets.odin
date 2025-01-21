@@ -133,6 +133,7 @@ Assets :: enum {
 	BOY1,
 	GIRL1,
 	GIRL2,
+	STAPPLER,
 }
 
 GLASSES := #load("assets/GJ1_glasses.png")
@@ -145,6 +146,7 @@ CHARACTER := #load("assets/mainchara.png")
 BOY1 := #load("assets/GJ1_char1.png")
 GIRL1 := #load("assets/GJ1_char2.png")
 GIRL2 := #load("assets/GJ1_char3.png")
+STAPPLER := #load("assets/GJ1_stappler.png")
 
 AssetsList: map[Assets]rl.Texture2D
 
@@ -183,6 +185,9 @@ load_textures :: proc() {
 		),
 		.GIRL2     = rl.LoadTextureFromImage(
 			rl.LoadImageFromMemory(".png", raw_data(GIRL2), i32(len(GIRL2))),
+		),
+		.STAPPLER  = rl.LoadTextureFromImage(
+			rl.LoadImageFromMemory(".png", raw_data(STAPPLER), i32(len(STAPPLER))),
 		),
 	}
 }

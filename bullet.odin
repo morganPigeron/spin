@@ -10,6 +10,7 @@ import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
 Bullet :: struct {
+	sprite:           Sprite,
 	body_id:          b2.BodyId,
 	shape_id:         b2.ShapeId,
 	extends:          b2.Vec2,
@@ -26,7 +27,7 @@ common_bullet: Bullet = {
 	time_to_live_sec = 2,
 }
 
-create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
+create_bullet_from_player :: proc(ctx: GameCtx, world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.shape_type = .BULLET_FROM_PLAYER
 	body := b2.DefaultBodyDef()
 	body.type = .dynamicBody
@@ -43,6 +44,7 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.shape_id = shape_id
 	bullet.speed = common_bullet.speed * UNIT
 	bullet.time_to_live_sec = common_bullet.time_to_live_sec
+	bullet.sprite = new_stappler(ctx)
 	b2.Shape_SetUserData(shape_id, &ShapeTypeBulletFromPlayer)
 	return
 }
@@ -53,9 +55,11 @@ cleanup_bullet :: proc(bullet: Bullet) {
 
 update_bullet :: proc(bullet: ^Bullet) {
 	bullet.time_to_live_sec -= rl.GetFrameTime()
+	update_sprite(&bullet.sprite)
 }
 
-render_bullet :: proc(bullet: Bullet) {
+render_bullet :: proc(bullet: ^Bullet) {
 	pos := b2.Body_GetPosition(bullet.body_id)
-	rl.DrawCircleV(pos.xy, bullet.extends.x, rl.PURPLE)
+	render_sprite(&bullet.sprite, pos)
+	//rl.DrawCircleV(pos.xy, bullet.extends.x, rl.PURPLE)
 }

@@ -86,8 +86,8 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 			render_enemy(enemy)
 		}
 		render_player(game_ctx.player)
-		for bullet in game_ctx.bullets {
-			render_bullet(bullet)
+		for &bullet in game_ctx.bullets {
+			render_bullet(&bullet)
 		}
 	}
 

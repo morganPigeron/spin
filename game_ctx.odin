@@ -54,7 +54,7 @@ GameCtx :: struct {
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
-	append(&ctx.bullets, create_bullet_from_player(ctx.world_id))
+	append(&ctx.bullets, create_bullet_from_player(ctx^, ctx.world_id))
 	bullet := &ctx.bullets[len(ctx.bullets) - 1]
 	bullet.direction = direction
 	b2.Body_SetTransform(bullet.body_id, start_pos, {0, 0})
@@ -91,7 +91,9 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.BOY1      = AssetsList[.BOY1],
 		.GIRL1     = AssetsList[.GIRL1],
 		.GIRL2     = AssetsList[.GIRL2],
+		.STAPPLER  = AssetsList[.STAPPLER],
 	}
+	assert(len(ctx.assets) == len(AssetsList))
 
 	ctx.musics = {
 		.BAD_SPIN     = SoundsList[.BAD_SPIN],
@@ -110,6 +112,7 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 		.WALKING_FX_2 = SoundsList[.WALKING_FX_2],
 		.WALKING_FX_3 = SoundsList[.WALKING_FX_3],
 	}
+	assert(len(ctx.musics) == len(SoundsList))
 
 	ctx.game_clock = new_game_clock()
 	return
