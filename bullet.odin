@@ -10,18 +10,20 @@ import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
 Bullet :: struct {
-	body_id:    b2.BodyId,
-	shape_id:   b2.ShapeId,
-	extends:    b2.Vec2,
-	shape_type: ShapeType,
-	speed:      f32,
-	direction:  rl.Vector2,
-	density:    f32,
+	body_id:          b2.BodyId,
+	shape_id:         b2.ShapeId,
+	extends:          b2.Vec2,
+	shape_type:       ShapeType,
+	speed:            f32,
+	direction:        rl.Vector2,
+	density:          f32,
+	time_to_live_sec: f32,
 }
 
 common_bullet: Bullet = {
-	speed   = 144,
-	density = 0.1,
+	speed            = 144,
+	density          = 0.1,
+	time_to_live_sec = 2,
 }
 
 create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
@@ -40,8 +42,17 @@ create_bullet_from_player :: proc(world_id: b2.WorldId) -> (bullet: Bullet) {
 	bullet.body_id = body_id
 	bullet.shape_id = shape_id
 	bullet.speed = common_bullet.speed * UNIT
+	bullet.time_to_live_sec = common_bullet.time_to_live_sec
 	b2.Shape_SetUserData(shape_id, &ShapeTypeBulletFromPlayer)
 	return
+}
+
+cleanup_bullet :: proc(bullet: Bullet) {
+	b2.DestroyBody(bullet.body_id)
+}
+
+update_bullet :: proc(bullet: ^Bullet) {
+	bullet.time_to_live_sec -= rl.GetFrameTime()
 }
 
 render_bullet :: proc(bullet: Bullet) {

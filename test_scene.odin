@@ -31,6 +31,17 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 		}
 	}
 
+	for i := 0; i < len(game_ctx.bullets); {
+		bullet := &game_ctx.bullets[i]
+		update_bullet(bullet)
+		if bullet.time_to_live_sec <= 0 {
+			cleanup_bullet(bullet^)
+			unordered_remove(&game_ctx.bullets, i)
+		} else {
+			i += 1
+		}
+	}
+
 	for &sprite in game_ctx.sprites {
 		update_sprite(&sprite)
 	}
