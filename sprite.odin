@@ -68,6 +68,19 @@ new_sugar :: proc(ctx: GameCtx) -> (result: Sprite) {
 	return
 }
 
+new_carrot :: proc(ctx: GameCtx) -> (result: Sprite) {
+	result.texture = ctx.assets[.CARROT]
+	result.asset = .CARROT
+	result.rect = rl.Rectangle{0, 0, 32, 32}
+	result.frame_count = 16
+	result.frame_cursor = 0
+	result.current_time = 0.0
+	result.frame_time = 0.12
+	result.increment = 1
+	result.ping_pong = false
+	return
+}
+
 new_printer :: proc(ctx: GameCtx) -> (result: Sprite) {
 	result.texture = ctx.assets[.PRINTER]
 	result.asset = .PRINTER

@@ -51,9 +51,11 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 			sprite = new_glass(ctx)
 		case 2:
 			sprite = new_sugar(ctx)
+		case 3:
+			sprite = new_carrot(ctx)
 		}
 
-		if selector == 2 {
+		if selector == 3 {
 			selector = 0
 		} else {
 			selector += 1
