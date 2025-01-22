@@ -24,6 +24,7 @@ Player :: struct {
 	last_direction_facing:      rl.Vector2,
 	last_time_jumped:           f32,
 	last_time_shooting:         f32,
+	walk_sound:                 rl.Music,
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
@@ -82,7 +83,8 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 	@(static) min_vel: f32 = 341232343
 	@(static) max_vel: f32 = -1
 
-	player_velocity := math.abs(b2.Body_GetLinearVelocity(player.body_id).y)
+	velocity := b2.Body_GetLinearVelocity(player.body_id)
+	player_velocity := math.abs(velocity.y)
 	jump_tolerance :: 0.01
 	is_still_vertically := player_velocity <= jump_tolerance
 
@@ -90,6 +92,16 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 		player.last_time_still_vertically += rl.GetFrameTime()
 	} else {
 		player.last_time_still_vertically = 0
+	}
+
+	if (is_still_vertically || player.is_on_ground || math.abs(velocity.y) <= 100) &&
+	   math.abs(velocity.x) > 0.1 {
+		if !rl.IsMusicStreamPlaying(player.walk_sound) {
+			rl.PlayMusicStream(player.walk_sound)
+			rl.SetMusicVolume(player.walk_sound, 0.1)
+		}
+	} else {
+		rl.PauseMusicStream(player.walk_sound)
 	}
 
 	for begin in contact_events.beginEvents[:contact_events.beginCount] {
@@ -122,6 +134,8 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 	pos := b2.Body_GetPosition(player.body_id)
 	player.image.pos =
 		pos - ({f32(player.image.texture.width), f32(player.image.texture.height)} / 2)
+
+	rl.UpdateMusicStream(player.walk_sound)
 }
 
 render_player :: proc(player: Player) {
@@ -157,5 +171,6 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
 	player.move_max_velocity = 3 * UNIT
 	b2.Shape_SetUserData(shape_id, &ShapeTypePlayer)
 	player.image = create_image(ctx, body.position, .CHARACTER)
+	player.walk_sound = SoundsList[.WALKING_FX_1]
 	return
 }
