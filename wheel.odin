@@ -18,19 +18,22 @@ WheelElement :: struct {
 }
 
 Wheel :: struct {
-	position:           rl.Vector2,
-	radius:             f32,
-	elements:           [dynamic]WheelElement,
-	angle:              f32,
-	speed:              f32,
-	impulse_speed:      f32,
-	friction:           f32,
-	is_turning:         bool,
-	need_to_play_sound: bool,
-	is_sound_playing:   bool,
-	good_sound:         rl.Music,
-	bad_sound:          rl.Music,
-	volume_sound:       f32,
+	position:             rl.Vector2,
+	radius:               f32,
+	elements:             [dynamic]WheelElement,
+	angle:                f32,
+	speed:                f32,
+	impulse_speed:        f32,
+	friction:             f32,
+	is_turning:           bool,
+	need_to_play_sound:   bool,
+	is_sound_playing:     bool,
+	good_sound:           rl.Music,
+	bad_sound:            rl.Music,
+	current_playing:      ^rl.Music,
+	current_playing_time: f32,
+	volume_sound:         f32,
+	sound_play_offset:    f32,
 }
 
 create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
@@ -76,7 +79,7 @@ delete_wheel :: proc(wheel: Wheel) {
 	delete(wheel.elements)
 }
 
-update_wheel :: proc(wheel: ^Wheel) {
+update_wheel :: proc(game_ctx: GameCtx, wheel: ^Wheel) {
 
 	if wheel.speed <= 0.01 && wheel.is_turning {
 		wheel.speed = 0
@@ -86,8 +89,14 @@ update_wheel :: proc(wheel: ^Wheel) {
 
 	if wheel.need_to_play_sound {
 		wheel.need_to_play_sound = false
-		rl.SetMusicVolume(wheel.good_sound, wheel.volume_sound)
-		rl.PlayMusicStream(wheel.good_sound)
+		wheel.current_playing = &wheel.good_sound
+		wheel.current_playing_time = 0
+		rl.SetMusicVolume(wheel.current_playing^, wheel.volume_sound)
+		rl.SeekMusicStream(
+			wheel.current_playing^,
+			game_ctx.main_music_delta_from_beat + wheel.sound_play_offset,
+		)
+		rl.PlayMusicStream(wheel.current_playing^)
 	}
 
 	if wheel.is_turning {
@@ -98,7 +107,20 @@ update_wheel :: proc(wheel: ^Wheel) {
 		}
 	}
 
-	wheel.is_sound_playing = rl.IsMusicStreamPlaying(wheel.good_sound)
+	if wheel.current_playing != nil {
+		wheel.is_sound_playing = rl.IsMusicStreamPlaying(wheel.current_playing^)
+	}
+
+	if (wheel.is_sound_playing) {
+		rl.UpdateMusicStream(wheel.current_playing^)
+		wheel.current_playing_time += rl.GetFrameTime()
+		length := rl.GetMusicTimeLength(wheel.current_playing^)
+		if wheel.current_playing_time >= length {
+			wheel.current_playing_time = 0
+			rl.StopMusicStream(wheel.current_playing^)
+			rl.SeekMusicStream(wheel.current_playing^, 0)
+		}
+	}
 
 	for &e in wheel.elements {
 		update_sprite(&e.sprite)

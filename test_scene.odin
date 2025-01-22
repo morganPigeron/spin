@@ -1,5 +1,7 @@
 package main
 
+import "core:math"
+
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
@@ -9,6 +11,19 @@ setup_test_scene :: proc(game_ctx: ^GameCtx) {
 }
 
 update_test_scene :: proc(game_ctx: ^GameCtx) {
+
+	rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME_2])
+	if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME_2]) {
+		rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME_2])
+	}
+	{
+		time_played := rl.GetMusicTimePlayed(game_ctx.musics[.MAIN_THEME_2])
+		beat_played := time_played / BPS
+		_, decimal := math.split_decimal(beat_played)
+		elapsed := decimal * BPS
+		game_ctx.main_music_delta_from_beat = elapsed
+	}
+
 	contact_events: b2.ContactEvents
 	{
 		dt := rl.GetFrameTime()
@@ -60,7 +75,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 		}
 	}
 
-	update_wheel(&game_ctx.wheel)
+	update_wheel(game_ctx^, &game_ctx.wheel)
 	update_clock(&game_ctx.game_clock)
 	update_camera(game_ctx)
 }

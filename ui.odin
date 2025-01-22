@@ -112,6 +112,10 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 				rl.SetMusicVolume(wheel.bad_sound, wheel.volume_sound)
 				rl.SetMusicVolume(wheel.good_sound, wheel.volume_sound)
 			}
+			{
+				mu.label(ctx, "sound offset: ")
+				mu.slider(ctx, &wheel.sound_play_offset, -BPS, BPS)
+			}
 			{ 	// friction slider
 				mu.label(ctx, "friction coef: ")
 				mu.slider(ctx, &wheel.friction, 0, 1)
