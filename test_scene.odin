@@ -15,6 +15,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 	rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME_2])
 	if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME_2]) {
 		rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME_2])
+		rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], 0.1)
 	}
 	{
 		time_played := rl.GetMusicTimePlayed(game_ctx.musics[.MAIN_THEME_2])

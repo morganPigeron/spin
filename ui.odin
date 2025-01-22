@@ -163,7 +163,7 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 			}
 			{ 	// main sound volume slider
 				mu.label(ctx, "main theme volume: ")
-				@(static) value: f32 = 1
+				@(static) value: f32 = 0.1
 				mu.slider(ctx, &value, 0, 1)
 				rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], value)
 			}
