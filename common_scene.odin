@@ -23,11 +23,8 @@ setup_common_scene :: proc(game_ctx: ^GameCtx) {
 	}
 
 	{
-		save, ok := os.read_entire_file_from_filename("save.spin")
-		defer delete(save)
-		if ok {
-			deserialize_ctx(game_ctx, save)
-		}
+		save := #load("save.spin")
+		deserialize_ctx(game_ctx, save)
 	}
 
 }
