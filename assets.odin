@@ -150,6 +150,8 @@ Assets :: enum {
     GIRL2,
     STAPPLER,
     CARROT,
+    WALL1,
+    WALL2,
 }
 
 GLASSES := #load("assets/GJ1_glasses.png")
@@ -164,7 +166,8 @@ GIRL1 := #load("assets/GJ1_char2.png")
 GIRL2 := #load("assets/GJ1_char3.png")
 STAPPLER := #load("assets/GJ1_stappler.png")
 CARROT := #load("assets/GJ1_carrot_OL.png")
-
+WALL1 := #load("assets/GJ1_wall1.png")
+WALL2 := #load("assets/GJ1_wall2.png")
 AssetsList: map[Assets]rl.Texture2D
 
 delete_textures :: proc() {
@@ -173,6 +176,12 @@ delete_textures :: proc() {
 
 load_textures :: proc() {
     AssetsList = {
+	    .WALL1     = rl.LoadTextureFromImage(
+		rl.LoadImageFromMemory(".png", raw_data(WALL1), i32(len(WALL1))),
+	    ),
+	    .WALL2     = rl.LoadTextureFromImage(
+		rl.LoadImageFromMemory(".png", raw_data(WALL2), i32(len(WALL2))),
+	    ),
 	    .GLASSES   = rl.LoadTextureFromImage(
 		rl.LoadImageFromMemory(".png", raw_data(GLASSES), i32(len(GLASSES))),
 	    ),

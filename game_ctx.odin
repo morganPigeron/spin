@@ -27,6 +27,7 @@ Scenes :: enum {
 EditorMode :: enum {
     None,
     PlaceGround,
+    PlaceBackground,
     PlaceImage,
     PlaceSprite,
     Remove,
@@ -40,6 +41,7 @@ GameCtx :: struct {
     wheel:                      Wheel,
     grounds:                    [dynamic]Ground,
     images:                     [dynamic]Image,
+    background_images:          [dynamic]Image,
     sprites:                    [dynamic]Sprite,
     enemies:                    [dynamic]Enemy,
     bullets:                    [dynamic]Bullet,
@@ -68,6 +70,7 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
     ctx.sprites = make([dynamic]Sprite, 0, 100)
     ctx.grounds = make([dynamic]Ground, 0, 100)
     ctx.images = make([dynamic]Image, 0, 100)
+    ctx.background_images = make([dynamic]Image, 0, 100)
     ctx.key_inputs = {
 	    .UP            = .W,
 	    .DOWN          = .S,
@@ -94,6 +97,8 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	    .GIRL2     = AssetsList[.GIRL2],
 	    .STAPPLER  = AssetsList[.STAPPLER],
 	    .CARROT    = AssetsList[.CARROT],
+	    .WALL1     = AssetsList[.WALL1],
+	    .WALL2     = AssetsList[.WALL2],
     }
     assert(len(ctx.assets) == len(AssetsList))
 
@@ -135,6 +140,7 @@ delete_game_ctx :: proc(ctx: GameCtx) {
     delete(ctx.assets)
     delete(ctx.sprites)
     delete(ctx.images)
+    delete(ctx.background_images)
     delete(ctx.musics)
     delete_wheel(ctx.wheel)
 }
@@ -151,6 +157,7 @@ change_scene :: proc(ctx: ^GameCtx, new_scene: Scenes) {
 SerializeVersion :: enum {
     V1,
     V2, // sprites added as background
+    V3, // added background images
 }
 
 eat_next :: proc(buffer: []u8, cursor: ^int, $T: typeid) -> T {
@@ -216,6 +223,37 @@ deserialize_ctx :: proc(ctx: ^GameCtx, buffer: []u8) {
 	    rect := eat_next(buffer, &cursor, rl.Rectangle)
 	    append(&ctx.sprites, create_sprite(ctx^, pos, asset))
 	}
+
+    case .V3:
+	ground_count := eat_next(buffer, &cursor, int)
+	for i := 0; i < ground_count; i += 1 {
+	    pos := eat_next(buffer, &cursor, b2.Vec2)
+	    extend := eat_next(buffer, &cursor, b2.Vec2) // TODO no need for now 
+	    shape_type := eat_next(buffer, &cursor, ShapeType) // TODO no need for now 
+	    append(&ctx.grounds, create_ground(ctx.world_id, pos))
+	}
+
+	image_count := eat_next(buffer, &cursor, int)
+	for i := 0; i < image_count; i += 1 {
+	    pos := eat_next(buffer, &cursor, rl.Vector2)
+	    asset := eat_next(buffer, &cursor, Assets)
+	    append(&ctx.images, create_image(ctx^, pos, asset))
+	}
+
+	sprite_count := eat_next(buffer, &cursor, int)
+	for i := 0; i < sprite_count; i += 1 {
+	    pos := eat_next(buffer, &cursor, rl.Vector2)
+	    asset := eat_next(buffer, &cursor, Assets)
+	    rect := eat_next(buffer, &cursor, rl.Rectangle)
+	    append(&ctx.sprites, create_sprite(ctx^, pos, asset))
+	}
+	
+	image_count = eat_next(buffer, &cursor, int)
+	for i := 0; i < image_count; i += 1 {
+	    pos := eat_next(buffer, &cursor, rl.Vector2)
+	    asset := eat_next(buffer, &cursor, Assets)
+	    append(&ctx.background_images, create_image(ctx^, pos, asset))
+	}
     }
 }
 
@@ -265,5 +303,41 @@ serialize_ctx_v2 :: proc(ctx: ^GameCtx) -> []u8 {
 	serialize_type(&result, sprite.rect)
     }
 
+    return result[:]
+}
+
+
+serialize_ctx_v3 :: proc(ctx: ^GameCtx) -> []u8 {
+    result: [dynamic]u8
+
+    serialize_type(&result, SerializeVersion.V3)
+
+    serialize_type(&result, len(ctx.grounds))
+    for ground in ctx.grounds {
+	serialize_type(&result, b2.Body_GetPosition(ground.body_id))
+	serialize_type(&result, ground.extends)
+	serialize_type(&result, ground.shape_type)
+    }
+
+    serialize_type(&result, len(ctx.images))
+    for image in ctx.images {
+	serialize_type(&result, image.pos)
+	serialize_type(&result, image.asset)
+    }
+
+    serialize_type(&result, len(ctx.sprites))
+    for sprite in ctx.sprites {
+	serialize_type(&result, sprite.position)
+	serialize_type(&result, sprite.asset)
+	serialize_type(&result, sprite.rect)
+    }
+
+    serialize_type(&result, len(ctx.background_images))
+    for image in ctx.background_images {
+	serialize_type(&result, image.pos)
+	serialize_type(&result, image.asset)
+    }
+
+    
     return result[:]
 }

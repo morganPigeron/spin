@@ -98,6 +98,8 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 
 	    pos: rl.Vector2 = nearest_grid_pos(mouse.xy, grid_spacing)
 	    switch game_ctx.editor_mode {
+	    case .PlaceBackground:
+		fallthrough
 	    case .PlaceImage:
 		rl.DrawTextureV(game_ctx.assets[game_ctx.selected_asset], pos, rl.WHITE)
 	    case .PlaceSprite:
@@ -140,6 +142,20 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 		}
 
 		button_rect.y += PADDING + button_rect.height
+		if rl.GuiButton(button_rect, "place WALL1") {
+		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.selected_asset = .WALL1
+		    grid_spacing = 64
+		}
+		
+		button_rect.y += PADDING + button_rect.height
+		if rl.GuiButton(button_rect, "place WALL2") {
+		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.selected_asset = .WALL2
+		    grid_spacing = 64
+		}
+
+		button_rect.y += PADDING + button_rect.height
 		if rl.GuiButton(button_rect, "place printer") {
 		    game_ctx.editor_mode = .PlaceSprite
 		    grid_spacing = 8
@@ -160,7 +176,7 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 
 		button_rect.y += PADDING + button_rect.height
 		if rl.GuiButton(button_rect, "save") {
-		    save := serialize_ctx_v2(game_ctx)
+		    save := serialize_ctx_v3(game_ctx)
 		    defer delete(save)
 		    os.write_entire_file("save.spin", save)
 		}
@@ -178,6 +194,17 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 	    }
 
 	    switch game_ctx.editor_mode {
+	    case .PlaceBackground:
+		if rl.IsMouseButtonPressed(.LEFT) {
+		    append(
+			    &game_ctx.background_images,
+			create_image(
+			    game_ctx^,
+			    nearest_grid_pos(mouse.xy, grid_spacing),
+			    game_ctx.selected_asset,
+			),
+		    )
+		}
 	    case .PlaceImage:
 		if rl.IsMouseButtonPressed(.LEFT) {
 		    append(
@@ -228,6 +255,20 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 			    if is_overlapping_image(mouse.xy, game_ctx.images[i]) {
 				log.debugf("overlap %v", game_ctx.images[i].asset)
 				unordered_remove(&game_ctx.images, i)
+				lenght -= 1
+			    } else {
+				i += 1
+			    }
+			}
+		    }
+		    
+		    {
+			i := 0
+			lenght := len(game_ctx.background_images)
+			for i < lenght {
+			    if is_overlapping_image(mouse.xy, game_ctx.background_images[i]) {
+				log.debugf("overlap %v", game_ctx.background_images[i].asset)
+				unordered_remove(&game_ctx.background_images, i)
 				lenght -= 1
 			    } else {
 				i += 1
