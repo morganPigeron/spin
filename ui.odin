@@ -174,8 +174,11 @@ all_windows :: proc(ctx: ^mu.Context, game_ctx: ^GameCtx) {
 	}
 	if .ACTIVE in mu.header(ctx, "bullets") {
 	    bullets := &game_ctx.bullets
+	    mu.layout_row(ctx, {150, -1}, 0)
+	    mu.label(ctx, "Count: ")
+	    mu.label(ctx, fmt.tprintf("%v", len(bullets)))
+
 	    if len(bullets) > 0 {
-		mu.layout_row(ctx, {150, -1}, 0)
 		{ 	// speed slider 
 		    mu.label(ctx, "speed: ")
 		    mu.slider(ctx, &common_bullet.speed, 1, 500)

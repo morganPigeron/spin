@@ -51,7 +51,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
     // Boss
     update_boss(game_ctx^, &game_ctx.boss, contact_events)
-    game_ctx.boss.behavior(&game_ctx.boss, game_ctx^) 
+    game_ctx.boss.behavior(&game_ctx.boss, game_ctx) 
 
     // call behavior
     // cleanup if enemy is dead

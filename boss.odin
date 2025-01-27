@@ -38,15 +38,18 @@ Boss :: struct {
     last_time_jumped:           f32,
     last_time_shooting:         f32,
     walk_sound:                 rl.Music,
-    behavior:                   proc(self: ^Boss, ctx: GameCtx),
+    behavior:                   proc(self: ^Boss, ctx: ^GameCtx),
     hp:                         f32,
     is_dead:                    bool,  
 }
 
-boss_behavior :: proc(self: ^Boss, ctx: GameCtx) {
+boss_behavior :: proc(self: ^Boss, ctx: ^GameCtx) {
     player_pos := b2.Body_GetPosition(ctx.player.body_id)
     self_pos := b2.Body_GetPosition(self.body_id)
 
+    boss_shoot(ctx, self_pos, rl.Vector2Normalize(player_pos - self_pos)) 
+    
+    /*
     if self_pos.x > player_pos.x {
 	boss_move_left(self)
     } else {
@@ -56,27 +59,14 @@ boss_behavior :: proc(self: ^Boss, ctx: GameCtx) {
     if self_pos.y > player_pos.y {
 	boss_jump(self)
     }
+    */
 }
 
-boss_shoot :: proc(ctx: ^GameCtx) {
-    DEBOUNCE :: 0.3
+boss_shoot :: proc(ctx: ^GameCtx, from: rl.Vector2, direction: rl.Vector2) {
+    DEBOUNCE :: 5
     if ctx.boss.last_time_shooting >= DEBOUNCE {
 	ctx.boss.last_time_shooting = 0
-
-	direction: rl.Vector2 = ctx.boss.last_direction_facing
-	if rl.IsKeyDown(ctx.key_inputs[.RIGHT]) {
-	    direction.x = 1
-	} else if rl.IsKeyDown(ctx.key_inputs[.LEFT]) {
-	    direction.x = -1
-	}
-
-	if rl.IsKeyDown(ctx.key_inputs[.UP]) {
-	    direction.y = -1
-	} else if rl.IsKeyDown(ctx.key_inputs[.DOWN]) {
-	    direction.y = 1
-	}
-
-	spawn_boss_bullet(ctx, b2.Body_GetPosition(ctx.boss.body_id), direction)
+	spawn_boss_bullet(ctx, from, direction)
     }
 }
 

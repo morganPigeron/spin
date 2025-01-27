@@ -131,7 +131,7 @@ update_enemy :: proc(ctx: GameCtx, enemy: ^Enemy, contact_events: b2.ContactEven
     
     { 	//test hit
 	for bullet in ctx.bullets {
-	    if rl.CheckCollisionPointRec(
+	    if bullet.shape_type == .BULLET_FROM_PLAYER && rl.CheckCollisionPointRec(
 		b2.Body_GetPosition(bullet.body_id).xy,
 		{
 		    pos.x - enemy.extends.x,

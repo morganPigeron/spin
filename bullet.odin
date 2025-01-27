@@ -66,7 +66,7 @@ create_bullet_from_boss :: proc (ctx: GameCtx, world_id: b2.WorldId) -> (bullet:
     bullet.shape_id = shape_id
     bullet.speed = common_bullet.speed * UNIT
     bullet.time_to_live_sec = common_bullet.time_to_live_sec
-    bullet.sprite = new_stappler(ctx)
+    bullet.sprite = new_printer(ctx)
     b2.Shape_SetUserData(shape_id, &ShapeTypeBulletFromBoss)
     return    
 }
