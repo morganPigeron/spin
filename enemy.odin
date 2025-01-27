@@ -5,6 +5,7 @@ import "core:log"
 import "core:mem"
 import "core:strings"
 import "core:unicode/utf8"
+import "core:math"
 
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
@@ -23,6 +24,10 @@ Enemy :: struct {
     image:             Image,
     behavior:          proc(self: ^Enemy, ctx: GameCtx),
     direction:         rl.Vector2,
+    last_direction_facing: rl.Vector2,
+    last_time_jumped: f32,
+    last_time_still_vertically: f32,
+    last_time_shooting: f32,
 }
 
 simple_behavior :: proc(self: ^Enemy, ctx: GameCtx) {
@@ -41,6 +46,7 @@ simple_behavior :: proc(self: ^Enemy, ctx: GameCtx) {
 }
 
 enemy_move_right :: proc(enemy: ^Enemy) {
+    enemy.last_direction_facing = {1, 0}
     velocity := b2.Body_GetLinearVelocity(enemy.body_id).x
     if velocity < 0 || abs(velocity) < enemy.move_max_velocity {
 	b2.Body_ApplyForceToCenter(enemy.body_id, {enemy.move_speed, 0}, true)
@@ -49,6 +55,7 @@ enemy_move_right :: proc(enemy: ^Enemy) {
 }
 
 enemy_move_left :: proc(enemy: ^Enemy) {
+    enemy.last_direction_facing = {-1, 0}
     velocity := b2.Body_GetLinearVelocity(enemy.body_id).x
     if velocity > 0 || abs(velocity) < enemy.move_max_velocity {
 	b2.Body_ApplyForceToCenter(enemy.body_id, {-enemy.move_speed, 0}, true)
@@ -57,60 +64,97 @@ enemy_move_left :: proc(enemy: ^Enemy) {
 }
 
 enemy_jump :: proc(enemy: ^Enemy) {
-    if enemy.is_on_ground {
+    DEBOUNCE :: 0.2
+    if enemy.is_on_ground && enemy.last_time_jumped > DEBOUNCE {
 	b2.Body_ApplyLinearImpulseToCenter(enemy.body_id, {0, -UNIT * enemy.jump_speed}, true)
+	enemy.last_time_jumped = 0
     }
 }
 
 update_enemy :: proc(ctx: GameCtx, enemy: ^Enemy, contact_events: b2.ContactEvents) {
-    pos := b2.Body_GetPosition(enemy.body_id)
-    if !enemy.is_dead {
 
-	for begin in contact_events.beginEvents[:contact_events.beginCount] {
-	    a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
-	    b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)
+    //update all timer : 
+    enemy.last_time_shooting += rl.GetFrameTime()
+    enemy.last_time_jumped += rl.GetFrameTime()
 
-	    if a^ == .GROUND && b^ == .ENEMY {
-		enemy.is_on_ground = true
-	    } else if a^ == .ENEMY && b^ == .GROUND {
-		enemy.is_on_ground = true
+    velocity := b2.Body_GetLinearVelocity(enemy.body_id)
+    enemy_velocity := math.abs(velocity.y)
+    jump_tolerance :: 0.01
+    is_still_vertically := enemy_velocity <= jump_tolerance
+
+    if is_still_vertically {
+	enemy.last_time_still_vertically += rl.GetFrameTime()
+    } else {
+	enemy.last_time_still_vertically = 0
+    }
+
+    /*
+    if (is_still_vertically || enemy.is_on_ground || math.abs(velocity.y) <= 100) &&
+	math.abs(velocity.x) > 0.1 {
+	    if !rl.IsMusicStreamPlaying(enemy.walk_sound) {
+		rl.PlayMusicStream(enemy.walk_sound)
+		rl.SetMusicVolume(enemy.walk_sound, 0.1)
 	    }
+      	} else {
+	    rl.PauseMusicStream(enemy.walk_sound)
 	}
+    */
 
-	for end in contact_events.endEvents[:contact_events.endCount] {
-	    a := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdA)
-	    b := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdB)
+    for begin in contact_events.beginEvents[:contact_events.beginCount] {
+	a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
+	b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)
 
-	    if a^ == .GROUND && b^ == .ENEMY {
-		enemy.is_on_ground = false
-	    } else if a^ == .ENEMY && b^ == .GROUND {
-		enemy.is_on_ground = false
-	    }
-	}
-
-
-	{ 	//test hit
-	    for bullet in ctx.bullets {
-		if rl.CheckCollisionPointRec(
-		    b2.Body_GetPosition(bullet.body_id).xy,
-		    {
-			pos.x - enemy.extends.x,
-			pos.y - enemy.extends.y,
-			enemy.extends.x * 2,
-			enemy.extends.y * 2,
-		    },
-		) {
-		    enemy.hp -= 10
-		}
-	    }
-	}
-
-	if enemy.hp <= 0 {
-	    enemy.is_dead = true
+	if a^ == .GROUND && b^ == .ENEMY && is_still_vertically {
+	    enemy.is_on_ground = true
+	} else if a^ == .ENEMY && b^ == .GROUND && is_still_vertically {
+	    enemy.is_on_ground = true
 	}
     }
 
+    for end in contact_events.endEvents[:contact_events.endCount] {
+	a := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdA)
+	b := transmute(^ShapeType)b2.Shape_GetUserData(end.shapeIdB)
+
+	if a^ == .GROUND && b^ == .ENEMY {
+	    enemy.is_on_ground = false
+	} else if a^ == .ENEMY && b^ == .GROUND {
+	    enemy.is_on_ground = false
+	}
+    }
+
+    TIME_TO_RESET_JUMP :: 0.2
+    if enemy.last_time_still_vertically > TIME_TO_RESET_JUMP {
+	enemy.is_on_ground = true
+    }
+
+    pos := b2.Body_GetPosition(enemy.body_id)
+    
+    { 	//test hit
+	for bullet in ctx.bullets {
+	    if rl.CheckCollisionPointRec(
+		b2.Body_GetPosition(bullet.body_id).xy,
+		{
+		    pos.x - enemy.extends.x,
+		    pos.y - enemy.extends.y,
+		    enemy.extends.x * 2,
+		    enemy.extends.y * 2,
+		},
+	    ) {
+		enemy.hp -= 10
+	    }
+	}
+    }
+
+    if enemy.hp <= 0 {
+	enemy.is_dead = true
+    }
+
     enemy.image.pos = pos - ({f32(enemy.image.texture.width), f32(enemy.image.texture.height)} / 2)
+    
+    enemy.image.pos =
+	pos - ({f32(enemy.image.texture.width), f32(enemy.image.texture.height)} / 2)
+
+    //rl.UpdateMusicStream(enemy.walk_sound)
 }
 
 render_enemy :: proc(enemy: Enemy) {

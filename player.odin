@@ -82,10 +82,6 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
     player.last_time_shooting += rl.GetFrameTime()
     player.last_time_jumped += rl.GetFrameTime()
 
-    //DEBUG TODO remove that
-    @(static) min_vel: f32 = 341232343
-    @(static) max_vel: f32 = -1
-
     velocity := b2.Body_GetLinearVelocity(player.body_id)
     player_velocity := math.abs(velocity.y)
     jump_tolerance :: 0.01

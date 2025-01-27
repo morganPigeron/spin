@@ -35,6 +35,8 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
     update_player(&game_ctx.player, contact_events)
 
+    // call behavior
+    // cleanup if enemy is dead
     for i := 0; i < len(game_ctx.enemies); {
 	enemy := &game_ctx.enemies[i]
 	update_enemy(game_ctx^, enemy, contact_events)
