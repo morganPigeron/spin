@@ -70,11 +70,30 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     for i := 0; i < len(game_ctx.bullets); {
 	bullet := &game_ctx.bullets[i]
 	update_bullet(bullet)
-	if bullet.time_to_live_sec <= 0 {
+	if bullet.time_to_live_sec <= 0 { // dont increment, this bullet is cleaned
 	    cleanup_bullet(bullet^)
 	    unordered_remove(&game_ctx.bullets, i)
-	} else {
-	    i += 1
+	} else { // Bullet still exist 
+	    i += 1 // increment the for loop
+	    
+	    if bullet.shape_type == .BULLET_FROM_BOSS {
+		for ground in game_ctx.grounds {
+		    ground_pos := b2.Body_GetPosition(ground.body_id)
+		    bullet_pos := b2.Body_GetPosition(bullet.body_id)
+		    if rl.CheckCollisionPointRec(
+			bullet_pos.xy,
+			{
+			    ground_pos.x - ground.extends.x,
+			    ground_pos.y - ground.extends.y,
+			    ground.extends.x * 2,
+			    ground.extends.y * 2,
+			},
+		    ) {
+			bullet.on_hit(game_ctx, bullet.body_id ,bullet_pos.xy)
+			bullet.time_to_live_sec = 0
+		    }
+		}
+	    }
 	}
     }
 

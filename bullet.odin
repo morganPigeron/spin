@@ -19,6 +19,7 @@ Bullet :: struct {
     direction:        rl.Vector2,
     density:          f32,
     time_to_live_sec: f32,
+    on_hit:           proc(ctx: ^GameCtx, id: b2.BodyId, position: [2]f32)
 }
 
 common_bullet: Bullet = {
@@ -68,7 +69,16 @@ create_bullet_from_boss :: proc (ctx: GameCtx, world_id: b2.WorldId) -> (bullet:
     bullet.time_to_live_sec = common_bullet.time_to_live_sec
     bullet.sprite = new_printer(ctx)
     b2.Shape_SetUserData(shape_id, &ShapeTypeBulletFromBoss)
+    bullet.on_hit = from_boss_on_hit 
     return    
+}
+
+from_boss_on_hit :: proc(game_ctx: ^GameCtx, id: b2.BodyId, position: [2]f32) {
+    velocity := b2.Body_GetLinearVelocity(id)
+    velocity.y *= -1
+    spawn_pos := position.xy - ((velocity/UNIT) * 2)
+    spawn_pos.y -= UNIT/2
+    append(&game_ctx.enemies, create_enemy(game_ctx^, spawn_pos, .GIRL1))
 }
 
 cleanup_bullet :: proc(bullet: Bullet) {
