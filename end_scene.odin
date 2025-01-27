@@ -1,31 +1,27 @@
 package main
 
+import "core:math"
+
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
 
-import "core:log"
-
-setup_menu_scene :: proc(game_ctx: ^GameCtx) {
+setup_end_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.wheel.position = {f32(state.screen_width / 2), f32(state.screen_height / 2)}
-
-    if !rl.IsMusicValid(game_ctx.musics[.MAIN_THEME_2]) {
-	log.error("music is not valid")
-    }
-
-    start_wheel(&game_ctx.wheel)
+    //start_wheel(&game_ctx.wheel)
 }
 
-update_menu_scene :: proc(game_ctx: ^GameCtx) {
+update_end_scene :: proc(game_ctx: ^GameCtx) {
     update_wheel(game_ctx^, &game_ctx.wheel)
-    update_clock(&game_ctx.game_clock)
-    rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME_2])
-    if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME_2]) {
-	rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME_2])
-	rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], 0.1)
+    //update_clock(&game_ctx.game_clock)
+    sound :: Sounds.GOOD_SPIN_2
+    rl.UpdateMusicStream(game_ctx.musics[sound])
+    if !rl.IsMusicStreamPlaying(game_ctx.musics[sound]) {
+	rl.PlayMusicStream(game_ctx.musics[sound])
+	rl.SetMusicVolume(game_ctx.musics[sound], 0.1)
     }
 }
 
-render_menu_scene :: proc(game_ctx: ^GameCtx) {
+render_end_scene :: proc(game_ctx: ^GameCtx) {
     {
 	rl.BeginMode2D(game_ctx.camera)
 	defer rl.EndMode2D()

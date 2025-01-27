@@ -11,16 +11,16 @@ import rl "vendor:raylib"
 
 // microui binding
 state := struct {
-	mu_ctx:         mu.Context,
-	bg:             mu.Color,
-	atlas_texture:  rl.RenderTexture2D,
-	screen_width:   c.int,
-	screen_height:  c.int,
-	screen_texture: rl.RenderTexture2D,
+    mu_ctx:         mu.Context,
+    bg:             mu.Color,
+    atlas_texture:  rl.RenderTexture2D,
+    screen_width:   c.int,
+    screen_height:  c.int,
+    screen_texture: rl.RenderTexture2D,
 } {
-	screen_width  = INITIAL_SCREEN_WIDTH,
-	screen_height = INITIAL_SCREEN_HEIGHT,
-	bg            = {90, 95, 100, 255},
+    screen_width  = INITIAL_SCREEN_WIDTH,
+    screen_height = INITIAL_SCREEN_HEIGHT,
+    bg            = {90, 95, 100, 255},
 }
 
 mouse_buttons_map := [mu.Mouse]rl.MouseButton {
@@ -47,16 +47,20 @@ key_map := [mu.Key][2]rl.KeyboardKey {
 }
 
 ShapeType :: enum {
-	PLAYER,
-	GROUND,
-	ENEMY,
-	BULLET_FROM_PLAYER,
+    PLAYER,
+    GROUND,
+    ENEMY,
+    BOSS,
+    BULLET_FROM_PLAYER,
+    BULLET_FROM_BOSS,
 }
 
 ShapeTypeGround := ShapeType.GROUND
 ShapeTypePlayer := ShapeType.PLAYER
 ShapeTypeEnemy := ShapeType.ENEMY
+ShapeTypeBoss := ShapeType.BOSS
 ShapeTypeBulletFromPlayer := ShapeType.BULLET_FROM_PLAYER
+ShapeTypeBulletFromBoss := ShapeType.BULLET_FROM_BOSS
 
 UNIT :: 64 // px => 1m
 INITIAL_SCREEN_WIDTH :: 1280 / 2

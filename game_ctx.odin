@@ -22,6 +22,7 @@ InputList :: enum {
 Scenes :: enum {
     Menu,
     Test,
+    End,
 }
 
 EditorMode :: enum {
@@ -38,6 +39,7 @@ GameCtx :: struct {
     world_id:                   b2.WorldId,
     camera:                     rl.Camera2D,
     player:                     Player,
+    boss:                       Boss,
     wheel:                      Wheel,
     grounds:                    [dynamic]Ground,
     images:                     [dynamic]Image,
@@ -58,6 +60,14 @@ GameCtx :: struct {
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
     append(&ctx.bullets, create_bullet_from_player(ctx^, ctx.world_id))
+    bullet := &ctx.bullets[len(ctx.bullets) - 1]
+    bullet.direction = direction
+    b2.Body_SetTransform(bullet.body_id, start_pos, {0, 0})
+    b2.Body_ApplyLinearImpulseToCenter(bullet.body_id, bullet.speed * bullet.direction, true)
+}
+
+spawn_boss_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {
+    append(&ctx.bullets, create_bullet_from_boss(ctx^, ctx.world_id))
     bullet := &ctx.bullets[len(ctx.bullets) - 1]
     bullet.direction = direction
     b2.Body_SetTransform(bullet.body_id, start_pos, {0, 0})
@@ -151,6 +161,9 @@ change_scene :: proc(ctx: ^GameCtx, new_scene: Scenes) {
     case .Test:
 	setup_test_scene(ctx)
 	ctx.current_scene = .Test
+    case .End:
+	setup_end_scene(ctx)
+	ctx.current_scene = .End
     }
 }
 

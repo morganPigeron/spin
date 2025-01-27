@@ -12,6 +12,8 @@ import b2 "vendor:box2d"
 import mu "vendor:microui"
 import rl "vendor:raylib"
 
+BLANC :: rl.Color{254, 250, 224, 255}
+
 WheelElement :: struct {
     color:  rl.Color,
     sprite: Sprite,
@@ -66,7 +68,7 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 
 	append(
 		&wheel.elements,
-	    WheelElement{color = rl.Color{u8(i * 40), 125, u8(i * 20), 255}, sprite = sprite},
+	    WheelElement{color = BLANC, sprite = sprite},
 	)
     }
     wheel.good_sound = ctx.musics[.GOOD_SPIN_FINAL]
@@ -135,7 +137,8 @@ start_wheel :: proc(wheel: ^Wheel) {
 }
 
 render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
-    rl.DrawCircleV(wheel.position, wheel.radius, rl.PURPLE)
+    rl.DrawCircleV(wheel.position, wheel.radius, BLANC)
+    rl.DrawRing(wheel.position, wheel.radius, wheel.radius + 4, 0, 360, 60, rl.BLACK)
 
     angle: f32 = 360 / f32(len(wheel.elements))
     for &element, i in wheel.elements {
@@ -159,10 +162,16 @@ render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
 	    {x_end, y_end} + wheel.position,
 	    element.color,
 	)
+
+	rl.DrawLineEx(wheel.position, {x_end, y_end} + wheel.position, 4, rl.BLACK)
+
+	sprite_pos: rl.Vector2 = {x_sprite, y_sprite} +
+	    (wheel.position)
+
+	rl.DrawCircleV(sprite_pos, 30, rl.WHITE)
 	render_sprite(
-		&element.sprite,
-	    {x_sprite, y_sprite} +
-		(wheel.position - {element.sprite.rect.width / 2, element.sprite.rect.height / 2}),
+		&element.sprite,sprite_pos -
+		{element.sprite.rect.width / 2, element.sprite.rect.height / 2}
 	)
     }
 
@@ -190,19 +199,23 @@ render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
     { 	// sec
 	angle: f32 = (f32(s) * 360 / 60) - 90
 	end := polar_to_cartesian(wheel.radius, f32(rl.DEG2RAD) * angle)
-	rl.DrawLineEx(wheel.position, end + wheel.position, 1, rl.BLACK)
+	rl.DrawLineEx(wheel.position, end + wheel.position, 4, {250, 199, 72, 255})
     }
 
     { 	// min
 	angle: f32 = (f32(m) * 360 / 60) - 90
 	end := polar_to_cartesian(wheel.radius / 4 * 3, f32(rl.DEG2RAD) * angle)
-	rl.DrawLineEx(wheel.position, end + wheel.position, 2, rl.BLACK)
+	rl.DrawLineEx(wheel.position, end + wheel.position, 6, {131, 144, 250, 255})
     }
 
     { 	// hour
 	angle: f32 = (f32(h) * 360 / 12) - 90
 	end := polar_to_cartesian(wheel.radius / 2, f32(rl.DEG2RAD) * angle)
-	rl.DrawLineEx(wheel.position, end + wheel.position, 3, rl.BLACK)
+	rl.DrawLineEx(wheel.position, end + wheel.position, 8, {29, 47, 111, 255})
+    }
+
+    {   //pivot
+	rl.DrawCircleV(wheel.position, 10, {29, 47, 111, 255})
     }
 
 }

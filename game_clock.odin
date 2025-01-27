@@ -29,3 +29,7 @@ update_clock :: proc(clock: ^GameClock) {
 	),
     )
 }
+
+is_over :: proc (clock: ^GameClock) -> bool {
+    return time.diff(clock.current_time, clock.end_time) <= 0
+}

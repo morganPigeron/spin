@@ -8,6 +8,9 @@ import rl "vendor:raylib"
 setup_test_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.wheel.position = {175 + 20, 175 + 20}
     game_ctx.game_clock = new_game_clock()
+    game_ctx.game_clock.time_speed = 10
+
+    game_ctx.boss = create_boss(game_ctx^, {200, f32(UNIT * 2)})
 }
 
 update_test_scene :: proc(game_ctx: ^GameCtx) {
@@ -34,6 +37,21 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     }
 
     update_player(&game_ctx.player, contact_events)
+    update_boss(game_ctx^, &game_ctx.boss, contact_events)
+    
+    // TODO DEBUG Spawn enemy over time
+    /*
+    @(static) last_spawn_time : f32 = 0
+    last_spawn_time += rl.GetFrameTime()
+    if last_spawn_time > 1 {
+	last_spawn_time = 0
+	append(&game_ctx.enemies, create_enemy(game_ctx^, {200, f32(UNIT * 2)}, .BOY1))
+    }
+    */
+
+    // Boss
+    update_boss(game_ctx^, &game_ctx.boss, contact_events)
+    game_ctx.boss.behavior(&game_ctx.boss, game_ctx^) 
 
     // call behavior
     // cleanup if enemy is dead
@@ -78,6 +96,13 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 	}
     }
 
+
+    { // check if game is over
+	if is_over(&game_ctx.game_clock) {
+	    change_scene(game_ctx, .End)
+	}
+    }
+    
     update_wheel(game_ctx^, &game_ctx.wheel)
     update_clock(&game_ctx.game_clock)
     update_camera(game_ctx)
@@ -98,15 +123,20 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 	for ground in game_ctx.grounds {
 	    render_ground(ground)
 	}
+	
 	for image in game_ctx.images {
 	    render_image(image)
 	}
+	
 	for &sprite in game_ctx.sprites {
 	    render_sprite(&sprite, sprite.position.xy)
 	}
+	
 	for &enemy in game_ctx.enemies {
 	    render_enemy(enemy)
 	}
+
+	render_boss(game_ctx.boss)
 	render_player(game_ctx.player)
 	for &bullet in game_ctx.bullets {
 	    render_bullet(&bullet)

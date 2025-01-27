@@ -31,3 +31,13 @@ render_image :: proc(image: Image) {
 render_image_direction :: proc(image: Image, direction: [2]f32) {
     rl.DrawTextureRec(image.texture, { 0, 0, -direction.x * f32(image.texture.width), f32(image.texture.height) } , image.pos, rl.WHITE)
 }
+
+render_image_direction_scale :: proc(image: Image, direction: [2]f32, scale: f32) {
+    rl.DrawTextureEx(
+	image.texture,
+	image.pos,
+	0,
+	scale, // scale
+	rl.WHITE,
+    )
+}
