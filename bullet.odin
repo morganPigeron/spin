@@ -96,5 +96,4 @@ render_bullet :: proc(bullet: ^Bullet) {
 	    &bullet.sprite,
 	pos - {bullet.sprite.rect.width / 2, bullet.sprite.rect.height / 2},
     )
-    //rl.DrawCircleV(pos.xy, bullet.extends.x, rl.PURPLE)
 }

@@ -60,6 +60,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 	update_enemy(game_ctx^, enemy, contact_events)
 	enemy.behavior(enemy, game_ctx^)
 	if enemy.is_dead {
+	    start_wheel(&game_ctx.wheel)
 	    cleanup_enemy(enemy^)
 	    unordered_remove(&game_ctx.enemies, i)
 	} else {

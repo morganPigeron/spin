@@ -88,18 +88,6 @@ update_enemy :: proc(ctx: GameCtx, enemy: ^Enemy, contact_events: b2.ContactEven
 	enemy.last_time_still_vertically = 0
     }
 
-    /*
-    if (is_still_vertically || enemy.is_on_ground || math.abs(velocity.y) <= 100) &&
-	math.abs(velocity.x) > 0.1 {
-	    if !rl.IsMusicStreamPlaying(enemy.walk_sound) {
-		rl.PlayMusicStream(enemy.walk_sound)
-		rl.SetMusicVolume(enemy.walk_sound, 0.1)
-	    }
-      	} else {
-	    rl.PauseMusicStream(enemy.walk_sound)
-	}
-    */
-
     for begin in contact_events.beginEvents[:contact_events.beginCount] {
 	a := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdA)
 	b := transmute(^ShapeType)b2.Shape_GetUserData(begin.shapeIdB)
