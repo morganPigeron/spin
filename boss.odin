@@ -65,7 +65,7 @@ boss_behavior :: proc(self: ^Boss, ctx: ^GameCtx) {
 }
 
 boss_shoot :: proc(ctx: ^GameCtx, from: rl.Vector2, direction: rl.Vector2) {
-    DEBOUNCE :: 5
+    DEBOUNCE :: 2.5
     if ctx.boss.last_time_shooting >= DEBOUNCE {
 	ctx.boss.last_time_shooting = 0
 	spawn_boss_bullet(ctx, from, direction)

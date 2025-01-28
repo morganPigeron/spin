@@ -143,15 +143,36 @@ render_editor :: proc(game_ctx: ^GameCtx) {
 
 		button_rect.y += PADDING + button_rect.height
 		if rl.GuiButton(button_rect, "place WALL1") {
-		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.editor_mode = .PlaceImage
 		    game_ctx.selected_asset = .WALL1
 		    grid_spacing = 64
 		}
 		
 		button_rect.y += PADDING + button_rect.height
 		if rl.GuiButton(button_rect, "place WALL2") {
-		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.editor_mode = .PlaceImage
 		    game_ctx.selected_asset = .WALL2
+		    grid_spacing = 64
+		}
+
+		button_rect.y += PADDING + button_rect.height
+		if rl.GuiButton(button_rect, "place WALL1BLUE") {
+		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.selected_asset = .WALL1BLUE
+		    grid_spacing = 64
+		}
+		
+		button_rect.y += PADDING + button_rect.height
+		if rl.GuiButton(button_rect, "place WALL2BLUE") {
+		    game_ctx.editor_mode = .PlaceBackground
+		    game_ctx.selected_asset = .WALL2BLUE
+		    grid_spacing = 64
+		}
+
+		button_rect.y += PADDING + button_rect.height
+		if rl.GuiButton(button_rect, "place FLOOR") {
+		    game_ctx.editor_mode = .PlaceImage
+		    game_ctx.selected_asset = .FLOOR
 		    grid_spacing = 64
 		}
 

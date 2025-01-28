@@ -148,6 +148,9 @@ Assets :: enum {
     CARROT,
     WALL1,
     WALL2,
+    WALL1BLUE,
+    WALL2BLUE,
+    FLOOR,
 }
 
 GLASSES := #load("assets/GJ1_glasses.png")
@@ -164,6 +167,10 @@ STAPPLER := #load("assets/GJ1_stappler.png")
 CARROT := #load("assets/GJ1_carrot_OL.png")
 WALL1 := #load("assets/GJ1_wall1.png")
 WALL2 := #load("assets/GJ1_wall2.png")
+WALL1BLUE := #load("assets/GJ1_wall1_blue.png")
+WALL2BLUE := #load("assets/GJ1_wall2_blue.png")
+FLOOR := #load("assets/GJ1_floor.png")
+
 AssetsList: map[Assets]rl.Texture2D
 
 delete_textures :: proc() {
@@ -178,6 +185,16 @@ load_textures :: proc() {
 	    .WALL2     = rl.LoadTextureFromImage(
 		rl.LoadImageFromMemory(".png", raw_data(WALL2), i32(len(WALL2))),
 	    ),
+	    .WALL1BLUE     = rl.LoadTextureFromImage(
+		rl.LoadImageFromMemory(".png", raw_data(WALL1BLUE), i32(len(WALL1BLUE))),
+	    ),
+	    .WALL2BLUE     = rl.LoadTextureFromImage(
+		rl.LoadImageFromMemory(".png", raw_data(WALL2BLUE), i32(len(WALL2BLUE))),
+	    ),
+	    .FLOOR     = rl.LoadTextureFromImage(
+		rl.LoadImageFromMemory(".png", raw_data(FLOOR), i32(len(FLOOR))),
+	    ),
+
 	    .GLASSES   = rl.LoadTextureFromImage(
 		rl.LoadImageFromMemory(".png", raw_data(GLASSES), i32(len(GLASSES))),
 	    ),

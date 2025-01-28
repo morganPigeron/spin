@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 setup_test_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.wheel.position = {175 + 20, 175 + 20}
     game_ctx.game_clock = new_game_clock()
-    game_ctx.game_clock.time_speed = 10
+    game_ctx.game_clock.time_speed = 1
 
     game_ctx.boss = create_boss(game_ctx^, {200, f32(UNIT * 2)})
 }
@@ -37,7 +37,6 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     }
 
     update_player(&game_ctx.player, contact_events)
-    update_boss(game_ctx^, &game_ctx.boss, contact_events)
     
     // TODO DEBUG Spawn enemy over time
     /*
@@ -50,9 +49,11 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     */
 
     // Boss
-    update_boss(game_ctx^, &game_ctx.boss, contact_events)
-    game_ctx.boss.behavior(&game_ctx.boss, game_ctx) 
-
+    if game_ctx.boss.body_id != b2.BodyId({}) {
+	update_boss(game_ctx^, &game_ctx.boss, contact_events)
+	game_ctx.boss.behavior(&game_ctx.boss, game_ctx) 
+    }
+    
     // call behavior
     // cleanup if enemy is dead
     for i := 0; i < len(game_ctx.enemies); {
@@ -118,7 +119,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
 
     { // check if game is over
-	if is_over(&game_ctx.game_clock) || game_ctx.boss.hp <= 0 {
+	if is_over(&game_ctx.game_clock) || (game_ctx.boss.hp <= 0 && game_ctx.boss.body_id != b2.BodyId({})) {
 	    change_scene(game_ctx, .End)
 	}
     }
@@ -156,7 +157,9 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 	    render_enemy(enemy)
 	}
 
-	render_boss(game_ctx.boss)
+	if game_ctx.boss.body_id != b2.BodyId({}) {
+	    render_boss(game_ctx.boss)
+	}
 	render_player(game_ctx.player)
 	for &bullet in game_ctx.bullets {
 	    render_bullet(&bullet)

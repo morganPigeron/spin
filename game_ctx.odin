@@ -109,6 +109,9 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 	    .CARROT    = AssetsList[.CARROT],
 	    .WALL1     = AssetsList[.WALL1],
 	    .WALL2     = AssetsList[.WALL2],
+	    .WALL1BLUE = AssetsList[.WALL1BLUE],
+	    .WALL2BLUE = AssetsList[.WALL2BLUE],
+	    .FLOOR     = AssetsList[.FLOOR],
     }
     assert(len(ctx.assets) == len(AssetsList))
 
