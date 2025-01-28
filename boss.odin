@@ -13,13 +13,13 @@ import rl "vendor:raylib"
 /*
 TODO
 
-Boss shoot printer,
-when printer hit floor or player, it become a employe, if it touch player, additional damage is taken
-when employe touch player, it advance time
-when player kill employee, it spin the wheel
+X Boss shoot printer,
+/ when printer hit floor or player, it become a employe, if it touch player, additional damage is taken
+  when employe touch player, it advance time
+X when player kill employee, it spin the wheel
 
-when boss is dead game is over
-when no more time left, game is over
+X when boss is dead game is over
+X when no more time left, game is over
 */
 
 BOSS_HP :: 1000
@@ -146,7 +146,7 @@ update_boss :: proc(ctx: GameCtx, boss: ^Boss, contact_events: b2.ContactEvents)
     
     { 	//test hit
 	for bullet in ctx.bullets {
-	    if rl.CheckCollisionPointRec(
+	    if bullet.shape_type == .BULLET_FROM_PLAYER && rl.CheckCollisionPointRec(
 		b2.Body_GetPosition(bullet.body_id).xy,
 		{
 		    pos.x - boss.extends.x,
@@ -213,7 +213,7 @@ create_boss :: proc(ctx: GameCtx, pos: [2]f32) -> (boss: Boss) {
     boss.move_max_velocity = 3 * UNIT
     b2.Shape_SetUserData(shape_id, &ShapeTypeBoss)
     boss.image = create_image(ctx, body.position, .BOY1)
-    boss.walk_sound = SoundsList[.WALKING_FX_1]
+    boss.walk_sound = SoundsList[.WALKING_1]
     boss.direction = {1,0}
     boss.hp = BOSS_HP
     boss.behavior = boss_behavior

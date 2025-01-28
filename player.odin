@@ -171,7 +171,7 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
     player.move_max_velocity = 3 * UNIT
     b2.Shape_SetUserData(shape_id, &ShapeTypePlayer)
     player.image = create_image(ctx, body.position, .CHARACTER)
-    player.walk_sound = SoundsList[.WALKING_FX_1]
+    player.walk_sound = SoundsList[.WALKING_1]
     player.direction = {1,0}
     return
 }

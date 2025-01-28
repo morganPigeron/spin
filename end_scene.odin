@@ -13,7 +13,7 @@ setup_end_scene :: proc(game_ctx: ^GameCtx) {
 update_end_scene :: proc(game_ctx: ^GameCtx) {
     update_wheel(game_ctx^, &game_ctx.wheel)
     //update_clock(&game_ctx.game_clock)
-    sound :: Sounds.GOOD_SPIN_2
+    sound :: Sounds.GOOD_SPIN
     rl.UpdateMusicStream(game_ctx.musics[sound])
     if !rl.IsMusicStreamPlaying(game_ctx.musics[sound]) {
 	rl.PlayMusicStream(game_ctx.musics[sound])

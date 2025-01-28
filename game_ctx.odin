@@ -114,22 +114,20 @@ new_game_ctx :: proc() -> (ctx: GameCtx) {
 
     ctx.musics = {
 	    .BAD_SPIN     = SoundsList[.BAD_SPIN],
-	    .BAD_SPIN_2   = SoundsList[.BAD_SPIN_2],
 	    .BAD_SPIN_FINAL   = SoundsList[.BAD_SPIN_FINAL],
 	    .GOOD_SPIN    = SoundsList[.GOOD_SPIN],
-	    .GOOD_SPIN_2  = SoundsList[.GOOD_SPIN_2],
     	    .GOOD_SPIN_FINAL  = SoundsList[.GOOD_SPIN_FINAL],
 	    .MAIN_THEME   = SoundsList[.MAIN_THEME],
 	    .MAIN_THEME_2 = SoundsList[.MAIN_THEME_2],
-	    .ATTACK_FX_1  = SoundsList[.ATTACK_FX_1],
-	    .ATTACK_FX_2  = SoundsList[.ATTACK_FX_2],
-	    .ATTACK_FX_3  = SoundsList[.ATTACK_FX_3],
-	    .JUMP_FX_1    = SoundsList[.JUMP_FX_1],
-	    .JUMP_FX_2    = SoundsList[.JUMP_FX_2],
-	    .JUMP_FX_3    = SoundsList[.JUMP_FX_3],
-	    .WALKING_FX_1 = SoundsList[.WALKING_FX_1],
-	    .WALKING_FX_2 = SoundsList[.WALKING_FX_2],
-	    .WALKING_FX_3 = SoundsList[.WALKING_FX_3],
+	    .ATTACK_1  = SoundsList[.ATTACK_1],
+	    .ATTACK_2  = SoundsList[.ATTACK_2],
+	    .ATTACK_3  = SoundsList[.ATTACK_3],
+	    .JUMP_1    = SoundsList[.JUMP_1],
+	    .JUMP_2    = SoundsList[.JUMP_2],
+	    .JUMP_3    = SoundsList[.JUMP_3],
+	    .WALKING_1 = SoundsList[.WALKING_1],
+	    .WALKING_2 = SoundsList[.WALKING_2],
+	    .WALKING_3 = SoundsList[.WALKING_3],
     }
     assert(len(ctx.musics) == len(SoundsList))
 
