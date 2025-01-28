@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 setup_test_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.wheel.position = {175 + 20, 175 + 20}
     game_ctx.game_clock = new_game_clock()
-    game_ctx.game_clock.time_speed = 1
+    game_ctx.game_clock.time_speed = 10
 
     game_ctx.boss = create_boss(game_ctx^, {200, f32(UNIT * 2)})
 }
