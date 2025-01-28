@@ -1,3 +1,2 @@
 #!/bin/bash
-
-odin build . -debug
+odin build . -debug && gf2 -ex run --args ./spin 

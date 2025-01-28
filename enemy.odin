@@ -199,3 +199,4 @@ create_enemy :: proc(ctx: GameCtx, pos: rl.Vector2, visual: Assets) -> (enemy: E
 cleanup_enemy :: proc(enemy: Enemy) {
     b2.DestroyBody(enemy.body_id)
 }
+

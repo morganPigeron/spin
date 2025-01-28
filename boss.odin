@@ -22,6 +22,8 @@ when boss is dead game is over
 when no more time left, game is over
 */
 
+BOSS_HP :: 1000
+
 Boss :: struct {
     body_id:                    b2.BodyId,
     shape_id:                   b2.ShapeId,
@@ -173,6 +175,17 @@ render_boss :: proc(boss: Boss) {
 
     render_image_direction_scale(boss.image, boss.direction, 2) 
     rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
+
+    top_left := pos.xy - {boss.extends.x, boss.extends.y * 2 + 10}
+
+    rl.DrawRectangle(i32(top_left.x), i32(top_left.y), i32(boss.extends.x * 2), 4, rl.BLACK)
+    rl.DrawRectangle(
+	i32(top_left.x),
+	i32(top_left.y),
+	i32(f32(boss.hp) * f32(boss.extends.x * 2.0) / f32(BOSS_HP)),
+	4,
+	rl.RED,
+    )
 }
 
 create_boss :: proc(ctx: GameCtx, pos: [2]f32) -> (boss: Boss) {
@@ -202,7 +215,7 @@ create_boss :: proc(ctx: GameCtx, pos: [2]f32) -> (boss: Boss) {
     boss.image = create_image(ctx, body.position, .BOY1)
     boss.walk_sound = SoundsList[.WALKING_FX_1]
     boss.direction = {1,0}
-    boss.hp = 1000
+    boss.hp = BOSS_HP
     boss.behavior = boss_behavior
     return
 }

@@ -118,7 +118,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
 
     { // check if game is over
-	if is_over(&game_ctx.game_clock) {
+	if is_over(&game_ctx.game_clock) || game_ctx.boss.hp <= 0 {
 	    change_scene(game_ctx, .End)
 	}
     }
