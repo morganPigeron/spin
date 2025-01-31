@@ -26,6 +26,16 @@ Player :: struct {
     last_time_jumped:           f32,
     last_time_shooting:         f32,
     walk_sound:                 rl.Music,
+    bonus:                      [dynamic]WheelElement,
+}
+
+delete_player :: proc(player: Player) {
+    delete(player.bonus)
+}
+
+attach_bonus_to_player :: proc(ctx: ^GameCtx) {
+    bonus := ctx.wheel.elements[ctx.wheel.winning_index]
+    append(&ctx.player.bonus, bonus)
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
@@ -130,6 +140,12 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 	player.is_on_ground = true
     }
 
+    { // update bonus
+	for &element in player.bonus {
+	    update_sprite(&element.sprite)
+	}
+    }
+    
     pos := b2.Body_GetPosition(player.body_id)
     player.image.pos =
 	pos - ({f32(player.image.texture.width), f32(player.image.texture.height)} / 2)
@@ -138,10 +154,28 @@ update_player :: proc(player: ^Player, contact_events: b2.ContactEvents) {
 }
 
 render_player :: proc(player: Player) {
+
+    @(static) last_pos: [100][2]f32
     pos := b2.Body_GetPosition(player.body_id)
     rot := b2.Body_GetRotation(player.body_id)
 
-    //render_image(player.image)
+    
+    for &element, i in player.bonus {
+	delta_pos: [2]f32
+	if i == 0 {
+	    delta_pos = pos - last_pos[i]
+	} else {
+	    delta_pos = last_pos[i-1] - last_pos[i]
+	}
+
+	last_pos[i] += delta_pos * 0.03
+	
+	render_sprite(
+		&element.sprite,
+	    last_pos[i] - {element.sprite.rect.width / 2, element.sprite.rect.height / 2}
+	)
+    }
+        
     render_image_direction(player.image, player.direction) 
     rl.DrawCircleLinesV(pos.xy, 10, rl.BLACK)
 }
@@ -173,5 +207,6 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
     player.image = create_image(ctx, body.position, .CHARACTER)
     player.walk_sound = SoundsList[.WALKING_1]
     player.direction = {1,0}
+    player.bonus = make([dynamic]WheelElement, 0, 10)
     return
 }

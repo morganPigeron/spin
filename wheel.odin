@@ -7,6 +7,7 @@ import "core:mem"
 import "core:strings"
 import "core:time"
 import "core:unicode/utf8"
+import "core:math/rand"
 
 import b2 "vendor:box2d"
 import mu "vendor:microui"
@@ -17,7 +18,9 @@ BLANC :: rl.Color{254, 250, 224, 255}
 WheelElement :: struct {
     color:  rl.Color,
     sprite: Sprite,
+    is_bonus: bool,
 }
+
 
 Wheel :: struct {
     position:             rl.Vector2,
@@ -36,6 +39,8 @@ Wheel :: struct {
     current_playing_time: f32,
     volume_sound:         f32,
     sound_play_offset:    f32,
+    winning_index:        int,
+    winning_pending:      int,
 }
 
 create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
@@ -49,15 +54,20 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
     for i in 0 ..< 16 {
 
 	sprite: Sprite
+	is_bonus: bool 
 	switch selector {
 	case 0:
 	    sprite = new_cig(ctx)
+	    is_bonus = false
 	case 1:
 	    sprite = new_glass(ctx)
+	    is_bonus = true
 	case 2:
 	    sprite = new_sugar(ctx)
+	    is_bonus = false
 	case 3:
 	    sprite = new_carrot(ctx)
+	    is_bonus = true
 	}
 
 	if selector == 3 {
@@ -68,7 +78,7 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 
 	append(
 		&wheel.elements,
-	    WheelElement{color = BLANC, sprite = sprite},
+	    WheelElement{color = BLANC, sprite = sprite, is_bonus = is_bonus},
 	)
     }
     wheel.good_sound = ctx.musics[.GOOD_SPIN_FINAL]
@@ -81,17 +91,34 @@ delete_wheel :: proc(wheel: Wheel) {
     delete(wheel.elements)
 }
 
+find_winning_index :: proc(wheel: Wheel) -> int {
+    //find result of winning element index
+    //for now it will be the top element
+    element_count := len(wheel.elements)
+    angle_per_element :f32 = 360.0 / f32(element_count)
+    index := int(math.ceil(wheel.angle / angle_per_element))
+    return index
+}
+
 update_wheel :: proc(game_ctx: GameCtx, wheel: ^Wheel) {
 
+    //end turning
     if wheel.speed <= 0.01 && wheel.is_turning {
 	wheel.speed = 0
 	wheel.is_turning = false
 	wheel.need_to_play_sound = true
+	wheel.winning_index = find_winning_index(wheel^)
+	wheel.winning_pending += 1
+
+	if wheel.elements[wheel.winning_index].is_bonus {
+	    wheel.current_playing = &wheel.good_sound 
+	} else {
+	    wheel.current_playing = &wheel.bad_sound
+	}
     }
 
     if wheel.need_to_play_sound {
 	wheel.need_to_play_sound = false
-	wheel.current_playing = &wheel.bad_sound
 	wheel.current_playing_time = 0
 	rl.SetMusicVolume(wheel.current_playing^, wheel.volume_sound)
 	rl.SeekMusicStream(
@@ -131,7 +158,9 @@ update_wheel :: proc(game_ctx: GameCtx, wheel: ^Wheel) {
 
 start_wheel :: proc(wheel: ^Wheel) {
     if wheel.is_turning == false {
-	wheel.speed = wheel.impulse_speed
+	random := rand.float32_range(-25,25)
+	
+	wheel.speed = wheel.impulse_speed + random
 	wheel.is_turning = true
     }
 }
@@ -140,6 +169,7 @@ render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
     rl.DrawCircleV(wheel.position, wheel.radius, BLANC)
     rl.DrawRing(wheel.position, wheel.radius, wheel.radius + 4, 0, 360, 60, rl.BLACK)
 
+    winning_index := find_winning_index(wheel)
     angle: f32 = 360 / f32(len(wheel.elements))
     for &element, i in wheel.elements {
 	angle_start: f32 = (angle * f32(i)) + wheel.angle
@@ -156,12 +186,21 @@ render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
 	x_end := wheel.radius * math.sin(f32(rl.DEG2RAD) * angle_end)
 	y_end := wheel.radius * math.cos(f32(rl.DEG2RAD) * angle_end)
 
-	rl.DrawTriangle(
-	    wheel.position,
-	    {x_start, y_start} + wheel.position,
-	    {x_end, y_end} + wheel.position,
-	    element.color,
-	)
+	if i == winning_index {
+	    rl.DrawTriangle(
+		wheel.position,
+		{x_start, y_start} + wheel.position,
+		{x_end, y_end} + wheel.position,
+		rl.GREEN,
+	    )
+	} else {
+	    rl.DrawTriangle(
+		wheel.position,
+		{x_start, y_start} + wheel.position,
+		{x_end, y_end} + wheel.position,
+		element.color,
+	    )
+	}
 
 	rl.DrawLineEx(wheel.position, {x_end, y_end} + wheel.position, 4, rl.BLACK)
 

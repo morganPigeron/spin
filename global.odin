@@ -65,7 +65,7 @@ ShapeTypeBulletFromBoss := ShapeType.BULLET_FROM_BOSS
 UNIT :: 64 // px => 1m
 INITIAL_SCREEN_WIDTH :: 1280 / 2
 INITIAL_SCREEN_HEIGHT :: 720 / 2
-DEFAULT_VOLUME :: 0.1
+DEFAULT_VOLUME :: 0.5
 grid_spacing: f32 = UNIT
 
 BPS: f32 : (60.0 / 157.0)

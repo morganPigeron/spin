@@ -18,7 +18,7 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME_2])
     if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME_2]) {
 	rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME_2])
-	rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], 0.1)
+	rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], DEFAULT_VOLUME)
     }
     {
 	time_played := rl.GetMusicTimePlayed(game_ctx.musics[.MAIN_THEME_2])
@@ -38,16 +38,6 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
     update_player(&game_ctx.player, contact_events)
     
-    // TODO DEBUG Spawn enemy over time
-    /*
-    @(static) last_spawn_time : f32 = 0
-    last_spawn_time += rl.GetFrameTime()
-    if last_spawn_time > 1 {
-	last_spawn_time = 0
-	append(&game_ctx.enemies, create_enemy(game_ctx^, {200, f32(UNIT * 2)}, .BOY1))
-    }
-    */
-
     // Boss
     if game_ctx.boss.body_id != b2.BodyId({}) {
 	update_boss(game_ctx^, &game_ctx.boss, contact_events)
@@ -121,6 +111,13 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
     { // check if game is over
 	if is_over(&game_ctx.game_clock) || (game_ctx.boss.hp <= 0 && game_ctx.boss.body_id != b2.BodyId({})) {
 	    change_scene(game_ctx, .End)
+	}
+    }
+
+    { // check winning 
+	if game_ctx.wheel.winning_pending > 0 {
+	    game_ctx.wheel.winning_pending -= 1
+	    attach_bonus_to_player(game_ctx)
 	}
     }
     

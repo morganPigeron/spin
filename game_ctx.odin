@@ -154,6 +154,7 @@ delete_game_ctx :: proc(ctx: GameCtx) {
     delete(ctx.background_images)
     delete(ctx.musics)
     delete_wheel(ctx.wheel)
+    delete_player(ctx.player)
 }
 
 change_scene :: proc(ctx: ^GameCtx, new_scene: Scenes) {
