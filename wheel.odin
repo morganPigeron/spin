@@ -51,7 +51,7 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
     wheel.friction = 0.60
 
     selector := 0
-    for i in 0 ..< 16 {
+    for i := 0; i < 16; i += 1 {
 
 	sprite: Sprite
 	is_bonus: bool 
@@ -81,6 +81,8 @@ create_wheel :: proc(ctx: GameCtx) -> (wheel: Wheel) {
 	    WheelElement{color = BLANC, sprite = sprite, is_bonus = is_bonus},
 	)
     }
+    
+    assert(len(wheel.elements) == 16)
     wheel.good_sound = ctx.musics[.GOOD_SPIN_FINAL]
     wheel.bad_sound = ctx.musics[.BAD_SPIN_FINAL]
     wheel.volume_sound = DEFAULT_VOLUME
@@ -92,11 +94,12 @@ delete_wheel :: proc(wheel: Wheel) {
 }
 
 find_winning_index :: proc(wheel: Wheel) -> int {
-    //find result of winning element index
-    //for now it will be the top element
     element_count := len(wheel.elements)
     angle_per_element :f32 = 360.0 / f32(element_count)
     index := int(math.ceil(wheel.angle / angle_per_element))
+    if index >= 16 {
+	index = 0
+    }
     return index
 }
 
@@ -172,9 +175,10 @@ render_wheel :: proc(ctx: GameCtx, wheel: Wheel) {
     winning_index := find_winning_index(wheel)
     angle: f32 = 360 / f32(len(wheel.elements))
     for &element, i in wheel.elements {
-	angle_start: f32 = (angle * f32(i)) + wheel.angle
-	angle_sprite: f32 = (angle * f32(i) + (angle / 2)) + wheel.angle
-	angle_end: f32 = (angle * f32(i + 1)) + wheel.angle
+	index := i + 1
+	angle_start: f32 = (angle * f32(index)) + wheel.angle
+	angle_sprite: f32 = (angle * f32(index) + (angle / 2)) + wheel.angle
+	angle_end: f32 = (angle * f32(index + 1)) + wheel.angle
 
 	x_start := wheel.radius * math.sin(f32(rl.DEG2RAD) * angle_start)
 	y_start := wheel.radius * math.cos(f32(rl.DEG2RAD) * angle_start)

@@ -1,6 +1,7 @@
 package main
 
 import "core:math"
+import "core:fmt"
 
 import b2 "vendor:box2d"
 import rl "vendor:raylib"
@@ -164,4 +165,33 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
     }
 
     rl.DrawFPS(10, 10)
+
+
+    @(static) width :f32 
+    @(static) height :f32= 22
+    padding :: 10
+    font_size :: 20
+    left: f32 = f32(rl.GetScreenWidth())/2.0-width/2.0
+    rl.DrawRectangleV({left, 9}, {width, height}, rl.GRAY)
+
+    width = 0
+    {
+	text := fmt.ctprintf("time speed %.2f |", game_ctx.game_clock.time_speed) 
+	size := rl.MeasureText(text, font_size)
+	left += padding
+	y :i32 = 10
+	rl.DrawText(text, i32(left), y, font_size, rl.BLACK)
+	left += f32(size)
+	width += f32(size) + padding
+    }
+        
+    {
+	text := fmt.ctprintf("damage %v", game_ctx.player.damage) 
+	size := rl.MeasureText(text, font_size)
+	left += padding
+	y :i32 = 10
+	rl.DrawText(text, i32(left), y, font_size, rl.BLACK)
+	left += f32(size)
+	width += f32(size) + padding * 2
+    }
 }

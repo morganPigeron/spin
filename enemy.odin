@@ -128,7 +128,7 @@ update_enemy :: proc(ctx: GameCtx, enemy: ^Enemy, contact_events: b2.ContactEven
 		    enemy.extends.y * 2,
 		},
 	    ) {
-		enemy.hp -= 20
+		enemy.hp -= ctx.player.damage
 	    }
 	}
     }

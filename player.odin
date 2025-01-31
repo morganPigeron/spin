@@ -27,6 +27,8 @@ Player :: struct {
     last_time_shooting:         f32,
     walk_sound:                 rl.Music,
     bonus:                      [dynamic]WheelElement,
+    shoot_cooldown:             f32,
+    damage:                     int,
 }
 
 delete_player :: proc(player: Player) {
@@ -36,11 +38,29 @@ delete_player :: proc(player: Player) {
 attach_bonus_to_player :: proc(ctx: ^GameCtx) {
     bonus := ctx.wheel.elements[ctx.wheel.winning_index]
     append(&ctx.player.bonus, bonus)
+    #partial switch bonus.sprite.asset {
+	case .CIG:
+	ctx.player.damage -= 10
+	if ctx.player.damage <= 0 {
+	    ctx.player.damage = 1
+	}
+	
+	case .GLASSES:
+	ctx.player.damage += 10
+	
+	case .SUGAR:
+	ctx.game_clock.time_speed += 10
+
+	case .CARROT:
+	ctx.game_clock.time_speed -= 10
+	if ctx.game_clock.time_speed <= 0 {
+	    ctx.game_clock.time_speed = 1
+	}
+    }
 }
 
 player_shoot :: proc(ctx: ^GameCtx) {
-    DEBOUNCE :: 0.3
-    if ctx.player.last_time_shooting >= DEBOUNCE {
+    if ctx.player.last_time_shooting >= ctx.player.shoot_cooldown {
 	ctx.player.last_time_shooting = 0
 
 	direction: rl.Vector2 = ctx.player.last_direction_facing
@@ -208,5 +228,7 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
     player.walk_sound = SoundsList[.WALKING_1]
     player.direction = {1,0}
     player.bonus = make([dynamic]WheelElement, 0, 10)
+    player.shoot_cooldown = 0.3
+    player.damage = 20
     return
 }

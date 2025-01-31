@@ -155,7 +155,7 @@ update_boss :: proc(ctx: GameCtx, boss: ^Boss, contact_events: b2.ContactEvents)
 		    boss.extends.y * 2,
 		},
 	    ) {
-		boss.hp -= 10
+		boss.hp -= f32(ctx.player.damage)
 	    }
 	}
     }
