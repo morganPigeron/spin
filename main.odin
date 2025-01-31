@@ -185,24 +185,27 @@ main :: proc() {
 	}
 	update_editor(&game_ctx)
 
-	{ 	// update mico ui 
-	    if rl.IsWindowResized() {
-		rl.UnloadRenderTexture(state.screen_texture)
-		state.screen_texture = rl.LoadRenderTexture(
-		    state.screen_width,
-		    state.screen_height,
-		)
-	    }
-	    mu.begin(ctx)
-	    all_windows(ctx, &game_ctx)
-	    mu.end(ctx)
-	}
-
-
 	{
 	    rl.BeginDrawing()
-	    defer {
 
+
+	    rl.ClearBackground(rl.RAYWHITE)
+
+	    switch game_ctx.current_scene {
+	    case .Test:
+		render_test_scene(&game_ctx)
+	    case .Menu:
+		render_menu_scene(&game_ctx)
+	    case .End:
+		render_end_scene(&game_ctx)
+	    }
+	    render_editor(&game_ctx)
+
+	    if game_ctx.current_scene == .Menu {
+		render(ctx)
+	    }
+
+	    if (game_ctx.is_editor) {
 		dur := time.stopwatch_duration(t0)
 		millis := time.duration_milliseconds(dur)
 		if mean_time_counter < 100 {
@@ -215,22 +218,9 @@ main :: proc() {
 		}
 		rl.DrawText(fmt.ctprintf("%2.2f ms", last_mean_time), 10, 30, 20, rl.RED)
 		rl.DrawText(fmt.ctprintf("%2.2f ms", millis), 10, 50, 20, rl.RED)
-		rl.EndDrawing()
 	    }
-	    rl.ClearBackground(rl.RAYWHITE)
+	    rl.EndDrawing()
 
-	    switch game_ctx.current_scene {
-	    case .Test:
-		render_test_scene(&game_ctx)
-	    case .Menu:
-		render_menu_scene(&game_ctx)
-	    case .End:
-		render_end_scene(&game_ctx)
-	    }
-	    render_editor(&game_ctx)
-	    render(ctx)
 	}
-
-
     }
 }

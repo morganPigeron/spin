@@ -56,6 +56,7 @@ GameCtx :: struct {
     selected_asset:             Assets,
     game_clock:                 GameClock,
     main_music_delta_from_beat: f32,
+    is_game_win:                bool,
 }
 
 spawn_player_bullet :: proc(ctx: ^GameCtx, start_pos: rl.Vector2, direction: rl.Vector2) {

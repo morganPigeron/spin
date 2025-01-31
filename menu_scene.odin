@@ -8,7 +8,7 @@ import "core:log"
 setup_menu_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.wheel.position = {f32(state.screen_width / 2), f32(state.screen_height / 2)}
 
-    if !rl.IsMusicValid(game_ctx.musics[.MAIN_THEME_2]) {
+    if !rl.IsMusicValid(game_ctx.musics[.MAIN_THEME]) {
 	log.error("music is not valid")
     }
 
@@ -18,10 +18,10 @@ setup_menu_scene :: proc(game_ctx: ^GameCtx) {
 update_menu_scene :: proc(game_ctx: ^GameCtx) {
     update_wheel(game_ctx^, &game_ctx.wheel)
     update_clock(&game_ctx.game_clock)
-    rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME_2])
-    if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME_2]) {
-	rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME_2])
-	rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME_2], DEFAULT_VOLUME)
+    rl.UpdateMusicStream(game_ctx.musics[.MAIN_THEME])
+    if !rl.IsMusicStreamPlaying(game_ctx.musics[.MAIN_THEME]) {
+	rl.PlayMusicStream(game_ctx.musics[.MAIN_THEME])
+	rl.SetMusicVolume(game_ctx.musics[.MAIN_THEME], DEFAULT_VOLUME)
     }
 }
 
@@ -31,6 +31,15 @@ render_menu_scene :: proc(game_ctx: ^GameCtx) {
 	defer rl.EndMode2D()
 
 	render_wheel(game_ctx^, game_ctx.wheel)
+    }
+
+    
+    {
+	text: cstring = "Kill the boss before 17:30h!"
+	size := rl.MeasureText(text, 40)
+	left := f32(rl.GetScreenWidth())/2.0 - f32(size)/2.0
+	y :i32 = rl.GetScreenHeight()/2 + 20
+	rl.DrawText(text, i32(left), y, 40, rl.BLACK)
     }
 
     {
@@ -50,5 +59,7 @@ render_menu_scene :: proc(game_ctx: ^GameCtx) {
 	}
     }
 
-    rl.DrawFPS(10, 10)
+    if (game_ctx.is_editor) {
+	rl.DrawFPS(10, 10)
+    }
 }

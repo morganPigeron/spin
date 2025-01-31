@@ -40,7 +40,7 @@ attach_bonus_to_player :: proc(ctx: ^GameCtx) {
     append(&ctx.player.bonus, bonus)
     #partial switch bonus.sprite.asset {
 	case .CIG:
-	ctx.player.damage -= 10
+	ctx.player.damage -= 2
 	if ctx.player.damage <= 0 {
 	    ctx.player.damage = 1
 	}
@@ -204,7 +204,7 @@ create_player :: proc(ctx: GameCtx) -> (player: Player) {
     player.shape_type = .PLAYER
     body := b2.DefaultBodyDef()
     body.type = .dynamicBody
-    body.position = {175, 200}
+    body.position = {175, -200}
     body.fixedRotation = true
     body_id := b2.CreateBody(ctx.world_id, body)
     player.extends = {UNIT / 4, UNIT / 4}

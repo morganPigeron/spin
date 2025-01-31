@@ -11,7 +11,7 @@ setup_test_scene :: proc(game_ctx: ^GameCtx) {
     game_ctx.game_clock = new_game_clock()
     game_ctx.game_clock.time_speed = 10
 
-    game_ctx.boss = create_boss(game_ctx^, {200, f32(UNIT * 2)})
+    game_ctx.boss = create_boss(game_ctx^, {200, 0})
 }
 
 update_test_scene :: proc(game_ctx: ^GameCtx) {
@@ -111,7 +111,9 @@ update_test_scene :: proc(game_ctx: ^GameCtx) {
 
     { // check if game is over
 	if is_over(&game_ctx.game_clock) || (game_ctx.boss.hp <= 0 && game_ctx.boss.body_id != b2.BodyId({})) {
-	    change_scene(game_ctx, .End)
+	    game_ctx.is_game_win = !is_over(&game_ctx.game_clock) && game_ctx.boss.hp <= 0
+	    cleanup_boss(game_ctx.boss)
+	    change_scene(game_ctx, .End)	 
 	}
     }
 
@@ -164,8 +166,9 @@ render_test_scene :: proc(game_ctx: ^GameCtx) {
 	}
     }
 
-    rl.DrawFPS(10, 10)
-
+    if (game_ctx.is_editor) {
+	rl.DrawFPS(10, 10)
+    }
 
     @(static) width :f32 
     @(static) height :f32= 22

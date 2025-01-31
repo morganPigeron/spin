@@ -22,7 +22,7 @@ X when boss is dead game is over
 X when no more time left, game is over
 */
 
-BOSS_HP :: 1000
+BOSS_HP :: 5000
 
 Boss :: struct {
     body_id:                    b2.BodyId,
@@ -218,4 +218,8 @@ create_boss :: proc(ctx: GameCtx, pos: [2]f32) -> (boss: Boss) {
     boss.hp = BOSS_HP
     boss.behavior = boss_behavior
     return
+}
+
+cleanup_boss :: proc(boss: Boss) {
+    b2.DestroyBody(boss.body_id)
 }
